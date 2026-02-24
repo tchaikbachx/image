@@ -1,4 +1,4 @@
-FROM python:3.15
+FROM python:3
 
 # set a directory for the app
 WORKDIR /usr/src/app
@@ -7,10 +7,10 @@ WORKDIR /usr/src/app
 COPY . .
 
 # install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# RUN pip install --no-cache-dir -r requirements.txt
 
 # define the port number the container should expose
-EXPOSE 5000
+EXPOSE 8080
 
 # run the command
-CMD ["python", "./app.py"]
+# CMD ["python", "./app.py"]
