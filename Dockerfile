@@ -1,5 +1,8 @@
 FROM python:3
 
+#
+LABEL org.opencontainers.image.source=https://github.com/tchaikbachx/image
+
 # set a directory for the app
 WORKDIR /usr/src/app
 
