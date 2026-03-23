@@ -8,6 +8,7 @@ cur = db.cursor()
 # creates the tables in the db
 def initTables():
     cur.execute("CREATE TABLE IF NOT EXISTS instrument(ID INT PRIMARY KEY, Name_ID, Old_ID, Type, Grade, Make, Model, Picture, Serial_Number, Price, Stored_In, Dept)")
+    cur.execute("CREATE TABLE IF NOT EXISTS kkey(ID INT PRIMARY KEY, Name_ID, Qty, Description)")
 
 # addInstrument()
 # adds an instrument with given fields to the database
@@ -18,7 +19,7 @@ def addInstrument(ID, Name_ID, Old_ID, Type, Grade, Make, Model, Picture, Serial
 # initialize tables
 initTables()
 
-addInstrument("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+#addInstrument("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
 
 # commit changes to db file
 db.commit()
