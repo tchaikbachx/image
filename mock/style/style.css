@@ -1,0 +1,132 @@
+/*  +-------------+ 
+    |   STYLING   |
+    +----- -------+*/
+
+@property --ol {
+    syntax: '<color>';
+    initial-value: rgb(0, 0, 0);
+    inherits: true;
+}
+
+@property --bg {
+    syntax: '<color>';
+    initial-value: rgb(0, 0, 0);
+    inherits: true;
+}
+
+@property --bt {
+    syntax: '<color>';
+    initial-value: rgb(0, 0, 0);
+    inherits: true;
+}
+
+
+:root {
+    --ol: rgb(92, 92, 147);
+    --bg: #e9ebef;
+    --bt: #007bff;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background: #ffffff;
+}
+
+/* banner */
+.dept-banner {
+    background: #000000;
+    color: rgb(255, 255, 255);
+    padding: 60px 5%;
+    margin: 0;
+}
+
+.home-container {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    margin-left: 40px;
+}
+
+.news-section {
+    flex: 3;
+    padding: 20px;
+    background: var(--bg);
+    border-radius: 8px;
+}
+
+.sidebar {
+    flex: 1;
+    margin-right: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sidebar button {
+    padding: 15px;
+    width: 100%;
+    cursor: pointer;
+    background-color: var(--bt);
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+.dashboard-box {
+    background: white;
+    max-width: 1100px;
+    margin: -30px auto 50px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+/* toolbar */
+.toolbar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* search bar */
+#dashboardSearch {
+    flex: 1;
+    color: var(--ol);
+    padding: 12px;
+    border: 1px solid var(--ol);
+    border-radius: 8px;
+}
+
+/* buttons */
+button {
+    padding: 10px 15px;
+    border: 1px solid var(--ol);
+    background: #fff;
+    color: var(--ol);
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* filter button */
+button:hover {
+    background: var(--ol);
+    color: white;
+}
+
+/* display grid */
+.grid {
+    display: grid;
+    /* grid-template-rows: repeat(auto-fill, minmax(20px, 1fr)); */
+    gap: 10px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--ol);;
+}
