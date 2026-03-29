@@ -1,6 +1,15 @@
 import sqlite3
 import datetime
 
+import addBorrower.py
+import addBroken.py
+import addCheckout.py
+import addDepartment.py
+import addInstrument.py
+import addKkey.py
+import addLocker.py
+import addMissing.py
+
 # connect to the database file
 db = sqlite3.connect("database.db")
 cur = db.cursor()
@@ -16,119 +25,6 @@ def initTables():
     cur.execute("CREATE TABLE IF NOT EXISTS missing(ID INT PRIMARY KEY, Date_Missing, Date_Found, Item_ID, Description)")
     cur.execute("CREATE TABLE IF NOT EXISTS broken(ID INT PRIMARY KEY, Date_Broken, Date_Fixed, Item_ID, Description)")
     cur.execute("CREATE TABLE IF NOT EXISTS department(ID INT PRIMARY KEY, Department_Name)")
-
-# addInstrument()
-# adds an instrument with given fields to the database
-def addInstrument(Name_ID: str, Old_ID: str, Type: str, Grade: str, Make: str, Model: str, Picture: str, Serial_Number: str, Price: float, Stored_In: int, Dept: int):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM instrument ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
-
-    # str() everything else
-    Name_ID = str(Name_ID)
-    Old_ID = str(Old_ID)
-    Type = str(Type)
-    Grade = str(Grade)
-    Make = str(Make)
-    Model = str(Model)
-    Picture = str(Picture)
-    Serial_Number = str(Serial_Number)
-    Price = str(Price)
-    Stored_In = str(Stored_In)
-    Dept = str(Dept)
-    cur.execute("INSERT INTO instrument VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Name_ID + "\',\'" + Old_ID + "\',\'" + Type + "\',\'" + Grade + "\',\'" + Make + "\',\'" + Model + "\',\'" + Picture + "\',\'" + Serial_Number + "\'," + Price + "," + Stored_In + "," + Dept + ")")
-
-# addKkey()
-# adds a kkey with given fields to the database
-# the description field is for any additional information about the kkey, such as what it opens or where it is stored
-def addKkey(Name_ID: str, Qty: int, Description: str):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM kkey ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
-
-    # str() everything else
-    Name_ID = str(Name_ID)
-    Qty = str(Qty)
-    Description = str(Description)
-    cur.execute("INSERT INTO kkey VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Name_ID + "\'," + Qty + ",\'" + Description + "\')")
-
-# addLocker()
-# adds a locker with given fields to the database
-# Checkoutable is a boolean field that indicates whether the locker can be checked out or not
-def addLocker(Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM locker ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
-
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # !! TODO: PUT CHECK FOR IF `Kkey` OR `Combo` IS LEFT EMPTY BELOW !!
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    # str() everything else
-    Kkey = str(Kkey)
-    Checkoutable = str(Checkoutable)
-    cur.execute("INSERT INTO locker VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Name_ID + "\',\'" + Combo + "\'," + Kkey + ",\'" + Checkoutable + "\')")
-
-# addBorrower()
-# adds a borrower with given fields to the database
-def addBorrower(Email: str):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM borrower ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
-
-    # str() everything else
-    Email = str(Email)
-    cur.execute("INSERT INTO borrower VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Email + "\')")
-
-# addCheckout()
-# adds a checkout record with given fields to the database
-def addCheckout(Borrower_ID: int, Item_ID: int, Due_Date: str):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM checkout ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
-
-    # str() everything else
-    Borrower_ID = str(Borrower_ID)
-    Item_ID = str(Item_ID)
-    Checkout_Date = str(datetime.date.today)
-    cur.execute("INSERT INTO checkout VALUES (" + str(prevID + 1 if prevID != None else 1) + "," + Borrower_ID + "," + Item_ID + ",\'" + Checkout_Date + "\',\'" + Due_Date + "\',\'" + Closed_Date + "\')")
-
-# addMissing()
-# adds a missing item record with given fields to the database
-def addMissing(Item_ID: int, Description: str):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM missing ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
-
-    # str() everything else
-    Date_Missing = str(datetime.date.today)
-    Item_ID = str(Item_ID)
-    Description = str(Description)
-    cur.execute("INSERT INTO missing VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Date_Missing + "\',\'" + "N/A" + "\'," + Item_ID + ",\'" + Description + "\')")
-
-# addBroken()
-# adds a broken item record with given fields to the database
-def addBroken(Item_ID: int, Description: str):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM broken ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
-
-    # str() everything else
-    Date_Broken = str(datetime.date.today)
-    Item_ID = str(Item_ID)
-    Description = str(Description)
-    cur.execute("INSERT INTO broken VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Date_Broken + "\',\'" + "N/A" + "\'," + Item_ID + ",\'" + Description + "\')")
-
-# addDepartment()
-# adds a department with given fields to the database
-def addDepartment(ID: int, Department_Name: str):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM department ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
-
-    # str() everything else
-    Department_Name = str(Department_Name)
-    cur.execute("INSERT INTO department VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Department_Name + "\')")
 
 # toydb 
 def toydb():
