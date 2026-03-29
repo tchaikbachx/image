@@ -1,14 +1,14 @@
 import sqlite3
 import datetime
 
-import addBorrower
-import addBroken
-import addCheckout
-import addDepartment
-import addInstrument
-import addKkey
-import addLocker
-import addMissing
+# import addBorrower
+# import addBroken
+# import addCheckout
+# import addDepartment
+# import addInstrument
+# import addKkey
+# import addLocker
+# import addMissing
 
 # connect to the database file
 db = sqlite3.connect("database.db")
