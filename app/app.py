@@ -41,7 +41,7 @@ def addInstrument(Name_ID: str, Old_ID: str, Type: str, Grade: str, Make: str, M
 # addKkey()
 # adds a kkey with given fields to the database
 # the description field is for any additional information about the kkey, such as what it opens or where it is stored
-def addKkey(ID: int, Name_ID: str, Qty: int, Description: str):
+def addKkey(Name_ID: str, Qty: int, Description: str):
     # fetch latest ID to populate the new ID field with
     prevID = cur.execute("SELECT ID FROM kkey ORDER BY ID DESC")
     prevID = cur.fetchone()[0]
@@ -55,21 +55,23 @@ def addKkey(ID: int, Name_ID: str, Qty: int, Description: str):
 # addLocker()
 # adds a locker with given fields to the database
 # Checkoutable is a boolean field that indicates whether the locker can be checked out or not
-def addLocker(ID: int, Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
+def addLocker(Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
     # fetch latest ID to populate the new ID field with
     prevID = cur.execute("SELECT ID FROM locker ORDER BY ID DESC")
     prevID = cur.fetchone()[0]
 
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # !! TODO: PUT CHECK FOR IF `Kkey` OR `Combo` IS LEFT EMPTY BELOW !!
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     # str() everything else
-    Name_ID = str(Name_ID)
-    Combo = str(Combo)
     Kkey = str(Kkey)
     Checkoutable = str(Checkoutable)
     cur.execute("INSERT INTO locker VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Name_ID + "\',\'" + Combo + "\'," + Kkey + ",\'" + Checkoutable + "\')")
 
 # addBorrower()
 # adds a borrower with given fields to the database
-def addBorrower(ID: int, Email: str):
+def addBorrower(Email: str):
     # fetch latest ID to populate the new ID field with
     prevID = cur.execute("SELECT ID FROM borrower ORDER BY ID DESC")
     prevID = cur.fetchone()[0]
@@ -80,7 +82,7 @@ def addBorrower(ID: int, Email: str):
 
 # addCheckout()
 # adds a checkout record with given fields to the database
-def addCheckout(ID: int, Borrower_ID: int, Item_ID: int, Checkout_Date: datetime.date, Due_Date: datetime.date, Closed_Date: datetime.date):
+def addCheckout(Borrower_ID: int, Item_ID: int, Due_Date: str):
     # fetch latest ID to populate the new ID field with
     prevID = cur.execute("SELECT ID FROM checkout ORDER BY ID DESC")
     prevID = cur.fetchone()[0]
@@ -88,38 +90,34 @@ def addCheckout(ID: int, Borrower_ID: int, Item_ID: int, Checkout_Date: datetime
     # str() everything else
     Borrower_ID = str(Borrower_ID)
     Item_ID = str(Item_ID)
-    Checkout_Date = str(Checkout_Date)
-    Due_Date = str(Due_Date)
-    Closed_Date = str(Closed_Date)
+    Checkout_Date = str(datetime.date.today)
     cur.execute("INSERT INTO checkout VALUES (" + str(prevID + 1 if prevID != None else 1) + "," + Borrower_ID + "," + Item_ID + ",\'" + Checkout_Date + "\',\'" + Due_Date + "\',\'" + Closed_Date + "\')")
 
 # addMissing()
 # adds a missing item record with given fields to the database
-def addMissing(ID: int, Date_Missing: datetime.date, Date_Found: datetime.date, Item_ID: int, Description: str):
+def addMissing(Item_ID: int, Description: str):
     # fetch latest ID to populate the new ID field with
     prevID = cur.execute("SELECT ID FROM missing ORDER BY ID DESC")
     prevID = cur.fetchone()[0]
 
     # str() everything else
-    Date_Missing = str(Date_Missing)
-    Date_Found = str(Date_Found)
+    Date_Missing = str(datetime.date.today)
     Item_ID = str(Item_ID)
     Description = str(Description)
-    cur.execute("INSERT INTO missing VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Date_Missing + "\',\'" + Date_Found + "\'," + Item_ID + ",\'" + Description + "\')")
+    cur.execute("INSERT INTO missing VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Date_Missing + "\',\'" + "N/A" + "\'," + Item_ID + ",\'" + Description + "\')")
 
 # addBroken()
 # adds a broken item record with given fields to the database
-def addBroken(ID: int, Date_Broken: datetime.date, Date_Fixed: datetime.date, Item_ID: int, Description: str):
+def addBroken(Item_ID: int, Description: str):
     # fetch latest ID to populate the new ID field with
     prevID = cur.execute("SELECT ID FROM broken ORDER BY ID DESC")
     prevID = cur.fetchone()[0]
 
     # str() everything else
-    Date_Broken = str(Date_Broken)
-    Date_Fixed = str(Date_Fixed)
+    Date_Broken = str(datetime.date.today)
     Item_ID = str(Item_ID)
     Description = str(Description)
-    cur.execute("INSERT INTO broken VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Date_Broken + "\',\'" + Date_Fixed + "\'," + Item_ID + ",\'" + Description + "\')")
+    cur.execute("INSERT INTO broken VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Date_Broken + "\',\'" + "N/A" + "\'," + Item_ID + ",\'" + Description + "\')")
 
 # addDepartment()
 # adds a department with given fields to the database
