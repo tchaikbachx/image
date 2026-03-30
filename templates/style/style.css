@@ -1,0 +1,447 @@
+/*  +-------------+ 
+    |   STYLING   |
+    +----- -------+*/
+
+
+/* this is a very messy file that is highly redundant and needs to be
+   optimized still. there is a mess of colors being used that also need to be
+   converted into variables. the broad style categories grouped together are:
+        > fonts [TBA]
+        > variables
+        > general/all
+        > home/index 
+        > dashboard 
+   there are also no comments anywhere because it annoying to comment .css files,
+   but i will go back and add some clarification one the most important blocks. */
+
+
+/* +----------------------------------------------------------------------------+
+   |                                                                 VARIABLES  |
+   +----------------------------------------------------------------------------+ */
+
+@property --ol {
+    syntax: '<color>';
+    initial-value: rgb(0, 0, 0);
+    inherits: true;
+}
+
+@property --bg {
+    syntax: '<color>';
+    initial-value: rgb(0, 0, 0);
+    inherits: true;
+}
+
+@property --bt {
+    syntax: '<color>';
+    initial-value: rgb(0, 0, 0);
+    inherits: true;
+}
+
+/* +----------------------------------------------------------------------------+
+   |                                                               GENERAL/ALL  |
+   +----------------------------------------------------------------------------+ */
+
+
+:root {
+    --ol: #007bff;
+    --bg: #e9ebef;
+    --bt: var(--ol);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 10px 40px;
+    border-bottom: 2px solid var(--ol);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--ol);
+    margin-right: 20px;
+    font-weight: bold;
+}
+
+.nav-btn {
+    background-color: var(--bt);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* i just used whatever fonts i had on hand, this is not a permanent choice. */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #212529;
+    line-height: 1.4;
+}
+
+.content {
+    flex: 1;
+}
+
+.card {
+    background: transparent;
+    padding: 20px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    /* transition: background 0.2s ease; */
+    text-align: left;
+    display: block;
+    width: 100%;
+}
+
+.card h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    color: var(--ol);
+}
+
+.card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+main {
+    flex: 1;
+}
+
+button {
+    padding: 10px 15px;
+    border: 1px solid var(--ol);
+    background: #fff;
+    color: var(--ol);
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+button:hover {
+    background: var(--ol);
+    color: white;
+}
+
+.dept-banner {
+    background: #000000;
+    color: rgb(255, 255, 255);
+    padding: 30px 5%;
+    margin: 0;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    position: relative;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.modal-content .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.modal.active {
+    display: flex !important;
+}
+
+.modal-content .close:hover {
+    color: var(--ol);
+}
+
+/* +----------------------------------------------------------------------------+
+   |                                                                HOME/INDEX  |
+   +----------------------------------------------------------------------------+ */
+
+.home-container {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    margin-left: 40px;
+}
+
+.news-section {
+    flex: 3;
+    padding: 20px;
+    background: var(--bg);
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+#auth-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+#auth-controls button {
+    width: 100%;
+    max-width: 250px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    /* transition: all 0.3s ease; */
+    border: 2px solid var(--ol);
+}
+
+.update-group {
+    display: none; 
+    gap: 5px;
+    align-items: center;
+}
+
+.update-group button {
+    width: 45px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body[data-logged-in="true"] .update-group {
+    display: flex !important;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+  75% { transform: translateX(-10px); }
+  100% { transform: translateX(0); }
+}
+
+.shake-error {
+  animation: shake 0.4s ease-in-out;
+  border: 2px solid #ff4d4d !important;
+}
+
+#loginModal input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#loginModal input:focus {
+    border-color: var(--ol);
+}
+
+.error-msg {
+    color: #ff4d4d;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    display: none; 
+    font-weight: bold;
+}
+
+.error-msg.visible {
+    display: block;
+}
+
+.sidebar {
+    flex: 1;
+    margin-right: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sidebar button {
+    width: 100%;
+    max-width: 250px;
+    padding: 12px;
+    cursor: pointer;
+    background-color: var(--ol);
+    color: white;
+    border: 2px solid var(--ol);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* +----------------------------------------------------------------------------+
+   |                                                                 DASHBOARD  |
+   +----------------------------------------------------------------------------+ */
+
+.scroll-container {
+    flex: 1;
+    height: 500px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow-y: auto;
+}
+
+#dashboardSearch {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.dashboard-box {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-main-content {
+    display: flex;
+    width: 100%;
+    height: 65vh;
+    align-items: flex-start;
+}
+
+#detailsContent {
+    padding: 10px 20px 20px 20px;
+    text-align: left;
+}
+
+.details-panel {
+    width: 0;
+    opacity: 0;
+    height: 500px;
+    background: rgb(235, 241, 249);
+    border: 1px solid var(--bt);
+    border-radius: 8px;
+    transition: width 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.details-panel.active {
+    width: 400px;
+    margin-left: 20px;
+    opacity: 1;
+}
+
+.details-panel .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--ol);
+    cursor: pointer;
+    z-index: 10;
+    line-height: 1;
+}
+
+.toolbar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    width: 100%; 
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.instrument-grid {
+    display: grid;
+}
+
+.edit-mode .instrument-card {
+    border: 2px dashed #28a745 !important;
+    cursor: pointer;
+}
+
+#edit-mode-btn.active-mode {
+    background-color: #1e7e34 !important;
+    box-shadow: inset 0 3px 5px rgba(0,0,0,0.2);
+}
+
+.delete-mode .instrument-card {
+    border: 2px dashed #ff4d4d !important;
+    cursor: pointer;
+}
+
+#delete-mode-btn.active-mode {
+    background-color: #651010 !important;
+    color: white;
+}
+
+.info-box {
+    background: var(--bg);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--ol);
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.info-box h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--ol);
+    font-size: 1.1rem;
+}
+
+.info-box p {
+    margin: 5px 0;
+}
+
+.info-box hr {
+    border: 0;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    margin: 10px 0;
+}
+
+.info-box ul {
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.info-box li {
+    margin-bottom: 3px;
+}

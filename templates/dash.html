@@ -1,0 +1,161 @@
+<!--+--------------+ 
+    |  DASHBOARD   |
+    +----- --------+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/templates/style/style.css">
+  <title>Inventory Dashboard</title>
+  <script src="/templates/script/fetch.js"></script>
+  <script>
+    // the following are scripts that execute to determine roles/content displayed.
+    //  > ideally, this is moved out to a separate .js file in /script,
+    //    since this is clunky & can be slow to include within an .html.
+    //  > i will worry about that later when i care
+    (function () {
+      const checkExist = setInterval(function () {
+        const toolbar = document.querySelector('.toolbar');
+        const mainNav = document.getElementById('mainNav');
+        // represents music checkout login if === true
+        const isStaff = localStorage.getItem('isStaff') === 'true';
+
+        // check role, update bool
+        if (toolbar && mainNav) {
+          if (isStaff) {
+            document.body.setAttribute('data-logged-in', 'true');
+            // show appropriate buttons if staff (edit, remove, add)
+            if (!document.querySelector('.update-group')) {
+              const updateGroup = document.createElement('div');
+              updateGroup.className = 'update-group';
+              updateGroup.innerHTML = `
+                                <button type="button" onclick="openAddModal()">🞣</button>
+                                <button type="button" id="delete-mode-btn" onclick="toggleDeleteMode()">♳</button>
+                                <button type="button" id="edit-mode-btn" onclick="toggleEditMode()">✎</button>
+                            `;
+              toolbar.appendChild(updateGroup);
+            } // if
+
+            // show appropriate buttons if logging out
+            if (!document.getElementById('logoutBtn')) {
+              const logoutBtn = document.createElement('button');
+              logoutBtn.id = 'logoutBtn';
+              logoutBtn.textContent = 'Logout';
+              logoutBtn.className = 'nav-btn';
+              logoutBtn.style.marginLeft = 'auto';
+              logoutBtn.onclick = () => {
+                localStorage.removeItem('isStaff');
+                window.location.replace('/');
+              };
+              mainNav.appendChild(logoutBtn);
+            } // if
+          } // if
+          clearInterval(checkExist);
+        } // if
+      }, 100);
+    })();
+
+    // display instrument information if card selected
+    function showDetails(name, model, status, notes) {
+      const panel = document.getElementById('detailsPanel');
+      const content = document.getElementById('detailsContent');
+      // info displayed [FIX: will be edited to include more later]
+      content.innerHTML = `
+                <h2>${name}</h2>
+                <p><strong>Model:</strong> ${model}</p>
+                <p><strong>Status:</strong> ${status}</p>
+                <hr>
+                <p><strong>Notes:</strong><br>${notes}</p>
+            `;
+      panel.classList.add('active');
+    } // showDetails
+
+    // hide instrument information if close selected
+    function hideDetails() {
+      document.getElementById('detailsPanel').classList.remove('active');
+    } // hideDetails
+  </script>
+</head>
+
+<body data-logged-in="false">
+  <!-- navigation bar -->
+  <nav id="mainNav" class="navbar">
+    <a href="/" class="nav-link">Home</a>
+  </nav>
+
+  <!-- banner  -->
+  <main class="content">
+    <header class="dept-banner">
+      <h1>Inventory Dashboard</h1>
+    </header>
+
+    <!-- main dash section -->
+    <div class="dashboard-box">
+      <!-- top tool area; contains search and all those buttons nearby -->
+      <div class="toolbar">
+        <input type="text" id="dashboardSearch" placeholder="Search for instruments..." onkeyup="filterDash()">
+        <div class="filter-group">
+          <button onclick="filterCategory('search')">Search</button>
+          <button onclick="filterCategory('filter')">Filter</button>
+        </div>
+      </div>
+
+      <!-- instrument containers/cards -->
+      <div class="dashboard-main-content">
+        <div class="scroll-container" style="flex: 1; overflow-y: auto; padding-right: 10px;">
+          <div class="instrument-grid" id="instrument-grid">
+            <p>Loading instruments from database...</p>
+          </div>
+        </div>
+
+        <!-- instrument info panel -->
+        <div id="detailsPanel" class="details-panel">
+          <button class="close-btn" onclick="hideDetails()">&times;</button>
+          <div id="detailsContent">
+            <div class="placeholder-state" style="text-align: center; margin-top: 100px; color: #aaa;">
+              <!-- <div style="font-size: 3rem; margin-bottom: 10px;">...</div>
+              <p>Select an instrument<br>to view maintenance logs and details.</p> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- add an instrument: button extension -->
+  <div id="addInstrumentModal" class="modal">
+    <div class="modal-content" style="max-width: 600px; width: 90%;">
+      <!-- FIX: need to migrate close styling to .css -->
+      <button class="close-btn" onclick="closeAddModal()"
+        style="position:absolute; top:10px; right:15px; background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+      <h2 style="color:var(--ol); margin-top:0;">Add New Instrument</h2>
+
+      <!-- FIX: need to edit add instrument modal to look less ugly -->
+      <form id="addInstrumentForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <input type="text" id="m_Name_ID" placeholder="Name (e.g., Violin4)" required>
+        <input type="text" id="m_Type" placeholder="Type (e.g., Violin)" required>
+        <input type="text" id="m_Make" placeholder="Make (e.g., Yamaha)">
+        <input type="text" id="m_Model" placeholder="Model">
+        <input type="text" id="m_Grade" placeholder="Grade (A, B, C)">
+        <input type="text" id="m_Old_ID" placeholder="Old ID/Legacy Tag">
+        <input type="text" id="m_Serial" placeholder="Serial Number">
+        <input type="number" id="m_Price" placeholder="Price" step="0.01" min="0" onblur="formatPrice(this)">
+        <input type="text" id="m_Stored" placeholder="Locker Number">
+        <input type="text" id="m_Dept" placeholder="Dept ID">
+
+        <button type="button" onclick="submitNewInstrument()"
+          style="grid-column: span 2; background:var(--ol); color:white; font-weight:bold; padding:12px;">Save to
+          Database</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- <footer> ... FIX: messes up the containers
+        &copy; <script>document.write(new Date().getFullYear());</script> Tchaikbachx.
+    </footer> -->
+</body>
+
+</html>

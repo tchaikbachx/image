@@ -1,0 +1,191 @@
+<!--+-------------+ 
+    |  HOMEPAGE   |
+    +----- -------+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/templates/style/style.css">
+  <title>Homepage</title>
+  <script src="/templates/script/fetch.js"></script>
+</head>
+
+<body>
+  <script>
+    // scripts that control restrictions after logins
+    (function () {
+      const isStaff = localStorage.getItem('isStaff');
+
+      if (isStaff === 'true') {
+        window.addEventListener('DOMContentLoaded', () => {
+          // hide standard login/view buttons if already logged in
+          const authControls = document.getElementById('auth-controls');
+          if (authControls) {
+            authControls.style.display = 'none';
+          } // if
+
+          // show staff badge (mainly for debugging)
+          const homeContainer = document.querySelector('.home-container');
+          if (homeContainer) {
+            const warning = document.createElement('div');
+            warning.className = 'info-box';
+            warning.style.borderLeft = "5px solid var(--ol)";
+            // FIX: if badge kept, will need to move div style to .css
+            warning.innerHTML = `
+                            <h3>Staff Session Active</h3>
+                            <p>You are currently logged in with enhanced permissions.</p>
+                            <div style="margin-top:15px; display:flex; gap:10px;">
+                                <button onclick="window.location.href='/dashboard'">Go to Dashboard</button>
+                                <button onclick="localStorage.removeItem('isStaff'); location.reload();">Logout</button>
+                            </div>
+                        `;
+            homeContainer.prepend(warning);
+          } // if
+        });
+      } // if
+    })();
+  </script>
+
+  <!-- navigation bar -->
+  <nav id="mainNav" class="navbar"></nav>
+
+  <main class="content">
+    <!-- banner -->
+    <header class="dept-banner">
+      <h1>Grinnell Music Department</h1>
+    </header>
+
+    <!-- holds all the homepage content -->
+    <div class="home-container">
+      <!-- updates -->
+      <section class="news-section">
+        <h2>Current Updates & News</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In non sem sed ante blandit convallis.
+          Curabitur tincidunt ornare justo id tincidunt. In sed blandit odio. Donec tristique arcu eu ante
+          sollicitudin, sit amet accumsan odio pharetra. Nam hendrerit porta nibh, et finibus dolor congue at.
+          Donec cursus ex non sapien maximus, et ultricies quam imperdiet. Vivamus quis blandit velit. Ut
+          vehicula vestibulum elit. Quisque sed ullamcorper ante. Aliquam erat volutpat. Integer accumsan
+          neque sit amet erat sagittis efficitur.</p>
+        <hr>
+        <p><strong>Note: </strong>Quisque non lacus commodo, mattis nunc eget, blandit magna.</p>
+        <p>Duis lectus nibh, varius eget porttitor sodales, pharetra mollis quam. Praesent sed egestas justo.
+          Proin egestas libero a magna commodo, nec efficitur mi sodales. Morbi lacinia est tortor, vitae
+          efficitur nisl elementum sit amet. Pellentesque aliquam sapien leo, eget pulvinar tortor maximus ac.
+          Phasellus vel turpis lorem. Sed sodales posuere auctor. Fusce tincidunt tellus tellus. Vivamus
+          interdum, est eu porta vehicula, massa quam eleifend ex, quis blandit ligula ex quis mauris. Donec
+          rutrum a libero et aliquet. Aliquam a nunc in quam vestibulum porttitor. Quisque eget ultricies
+          justo. Ut sodales finibus gravida.</p>
+      </section>
+
+      <!-- sidebar, contains login and whatever else; hours are not accurate -->
+      <aside class="sidebar">
+        <div class="info-box">
+          <h3>Service Hours</h3>
+          <p><strong>Hours:</strong></p>
+          <ul>
+            <li>Mon-Fri: 8am - 5pm</li>
+            <li>Sat-Sun: Closed</li>
+          </ul>
+          <hr>
+          <h3>Contact Us</h3>
+          <p><strong>Email:</strong> music@grinnell.edu</p>
+          <p><strong>Phone:</strong> (641) 269 2222</p>
+        </div>
+        <div id="auth-controls">
+          <button id="viewBtn" onclick="goToStudentView()">Inventory View</button>
+          <button id="loginBtn">Checkout Login</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- login pop-up behavior -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <button class="close" type="button">&times;</button>
+      <h2>Login</h2>
+      <form>
+        <input type="text" placeholder="Username" required>
+        <input type="password" placeholder="Password" required>
+        <div id="loginError" class="error-msg">All fields must be filled in!</div>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- <footer>
+        &copy; <script>document.write(new Date().getFullYear());</script> Tchaikbachx.
+    </footer> -->
+
+  <!-- script that handles all the login behaviors; will need to be migrated -->
+  <script>
+    const loginModal = document.getElementById('loginModal');
+    const loginBtn = document.getElementById('loginBtn');
+    const closeBtn = document.querySelector('.close');
+    const loginForm = document.querySelector('#loginModal form');
+
+    // login logic (role switching)
+    if (loginBtn && loginModal) {
+      loginBtn.onclick = () => {
+        if (localStorage.getItem('isStaff') === 'true') {
+          window.location.href = '/dashboard';
+        } else {
+          loginModal.classList.add('active');
+        } // elif
+      };
+      if (closeBtn) closeBtn.onclick = () => loginModal.classList.remove('active');
+      window.onclick = (e) => {
+        if (e.target == loginModal) loginModal.classList.remove('active');
+      };
+    } // if
+
+    // submission logic
+    if (loginForm) {
+      loginForm.onsubmit = function (e) {
+        e.preventDefault();
+
+        const modalContent = document.querySelector('#loginModal .modal-content');
+        const errorDiv = document.getElementById('loginError');
+        const inputs = this.querySelectorAll('input');
+        const user = inputs[0].value.trim();
+        const pass = inputs[1].value.trim();
+
+        // are the fields empty? they shouldn't be
+        if (!user || !pass) {
+          errorDiv.textContent = "All fields must be filled in!";
+          errorDiv.classList.add('visible');
+          // angry shake
+          modalContent.classList.add('shake-error');
+
+          setTimeout(() => {
+            modalContent.classList.remove('shake-error');
+          }, 400);
+          return; // stop
+        } // if
+
+        // validate the login very poorly
+        if (user === 't' && pass === 't') {
+          localStorage.setItem('isStaff', 'true');
+          window.location.assign('/dashboard');
+        } else {
+          errorDiv.textContent = "Invalid username or password entered.";
+          errorDiv.classList.add('visible');
+          modalContent.classList.add('shake-error');
+
+          setTimeout(() => {
+            modalContent.classList.remove('shake-error');
+          }, 400);
+        } // elif
+      };
+    } // if
+
+    function goToStudentView() {
+      window.location.href = '/dashboard';
+    } // goToStudentView
+  </script>
+</body>
+
+</html>

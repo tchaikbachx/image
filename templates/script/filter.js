@@ -2,7 +2,14 @@
     |  FILTERING  |
     +----- -------+*/
 
-// search
+
+// FIX: these are scripts that control the filtering capabilities,
+// but they are currently unused.
+
+
+/**
+ * filter via searching -- super unoptimized
+ */
 function filterDash() {
     let input = document.getElementById('dashboardSearch').value.toLowerCase();
     let cards = document.getElementsByClassName('card');
@@ -13,7 +20,10 @@ function filterDash() {
     } // for
 } // filterDash
 
-// filter
+/**
+ * filter via category -- super unoptimized
+ * @param {*} category 
+ */
 function filterCategory(category) {
     let cards = document.getElementsByClassName('card');
     for (let i = 0; i < cards.length; i++) {
