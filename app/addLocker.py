@@ -13,14 +13,10 @@ def addLocker(Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
     prevID = cur.execute("SELECT ID FROM locker ORDER BY ID DESC")
     prevID = cur.fetchone()[0]
 
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # !! TODO: PUT CHECK FOR IF `Kkey` OR `Combo` IS LEFT EMPTY BELOW !!
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
     # str() everything else
     Kkey = str(Kkey)
     Checkoutable = str(Checkoutable)
-    cur.execute("INSERT INTO locker VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Name_ID + "\',\'" + Combo + "\'," + Kkey + ",\'" + Checkoutable + "\')")
+    cur.execute("INSERT INTO locker VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Name_ID + "\',\'" + Combo if Combo != None else "N/A" + "\'," + Kkey if Kkey != None else "N/A" + ",\'" + Checkoutable + "\')")
 
 # call function with passed arguments
 addLocker(str(sys.argv[1]), str(sys.argv[2]), int(sys.argv[3]), bool(sys.argv[4]))
