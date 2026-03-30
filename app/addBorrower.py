@@ -6,7 +6,7 @@ import sqlite3
 db = sqlite3.connect("database.db")
 cur = db.cursor()
 
-# addBorrower()
+# addBorrower(Email: str):
 # adds a borrower with given fields to the database
 def addBorrower(Email: str):
     # fetch latest ID to populate the new ID field with

@@ -6,7 +6,7 @@ import sqlite3
 db = sqlite3.connect("database.db")
 cur = db.cursor()
 
-# addKkey()
+# addKkey(Name_ID: str, Qty: int, Description: str):
 # adds a kkey with given fields to the database
 # the description field is for any additional information about the kkey, such as what it opens or where it is stored
 def addKkey(Name_ID: str, Qty: int, Description: str):

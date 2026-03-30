@@ -6,7 +6,7 @@ import datetime
 db = sqlite3.connect("database.db")
 cur = db.cursor()
 
-# addMissing()
+# addMissing(Item_ID: int, Description: str):
 # adds a missing item record with given fields to the database
 def addMissing(Item_ID: int, Description: str):
     # fetch latest ID to populate the new ID field with

@@ -6,7 +6,7 @@ import datetime
 db = sqlite3.connect("database.db")
 cur = db.cursor()
 
-# addBroken()
+# addBroken(Item_ID: int, Description: str):
 # adds a broken item record with given fields to the database
 def addBroken(Item_ID: int, Description: str):
     # fetch latest ID to populate the new ID field with

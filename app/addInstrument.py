@@ -6,7 +6,7 @@ import sqlite3
 db = sqlite3.connect("database.db")
 cur = db.cursor()
 
-# addInstrument()
+# addInstrument(Name_ID: str, Old_ID: str, Type: str, Grade: str, Make: str, Model: str, Picture: str, Serial_Number: str, Price: float, Stored_In: int, Dept: int):
 # adds an instrument with given fields to the database
 def addInstrument(Name_ID: str, Old_ID: str, Type: str, Grade: str, Make: str, Model: str, Picture: str, Serial_Number: str, Price: float, Stored_In: int, Dept: int):
     # fetch latest ID to populate the new ID field with

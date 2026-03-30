@@ -5,7 +5,7 @@ import sqlite3
 db = sqlite3.connect("database.db")
 cur = db.cursor()
 
-# addLocker()
+# addLocker(Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
 # adds a locker with given fields to the database
 # Checkoutable is a boolean field that indicates whether the locker can be checked out or not
 def addLocker(Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):

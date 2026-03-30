@@ -6,7 +6,7 @@ import sqlite3
 db = sqlite3.connect("database.db")
 cur = db.cursor()
 
-# addDepartment()
+# addDepartment(Department_Name: str):
 # adds a department with given fields to the database
 def addDepartment(Department_Name: str):
     # fetch latest ID to populate the new ID field with
