@@ -9,8 +9,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/templates/style/style.css">
-  <title>Inventory Dashboard</title>
+  <title>Tchaikbachx | Inventory </title>
   <script src="/templates/script/fetch.js"></script>
+  <script src="/templates/script/filter.js"></script>
   <script>
     // the following are scripts that execute to determine roles/content displayed.
     //  > ideally, this is moved out to a separate .js file in /script,
@@ -18,34 +19,24 @@
     //  > i will worry about that later when i care
     (function () {
       const checkExist = setInterval(function () {
-        const toolbar = document.querySelector('.toolbar');
-        const mainNav = document.getElementById('mainNav');
-        // represents music checkout login if === true
+        const staffContainer = document.getElementById('staffActions');
         const isStaff = localStorage.getItem('isStaff') === 'true';
 
-        // check role, update bool
-        if (toolbar && mainNav) {
+        if (staffContainer) {
           if (isStaff) {
             document.body.setAttribute('data-logged-in', 'true');
-            // show appropriate buttons if staff (edit, remove, add)
-            if (!document.querySelector('.update-group')) {
-              const updateGroup = document.createElement('div');
-              updateGroup.className = 'update-group';
-              updateGroup.innerHTML = `
-                                <button type="button" onclick="openAddModal()">🞣</button>
-                                <button type="button" id="delete-mode-btn" onclick="toggleDeleteMode()">♳</button>
-                                <button type="button" id="edit-mode-btn" onclick="toggleEditMode()">✎</button>
-                            `;
-              toolbar.appendChild(updateGroup);
-            } // if
-
-            // show appropriate buttons if logging out
-            if (!document.getElementById('logoutBtn')) {
+            staffContainer.innerHTML = `
+          <button type="button" id="addInstrumentBtn" onclick="openAddModal()">🞣</button>
+          <button type="button" id="delete-mode-btn" onclick="toggleDeleteMode()">♳</button>
+          <button type="button" id="edit-mode-btn" onclick="toggleEditMode()">✎</button>
+        `;
+            // deal with adding logout to navbar cleanly
+            const mainNav = document.getElementById('mainNav');
+            if (mainNav && !document.getElementById('logoutBtn')) {
               const logoutBtn = document.createElement('button');
               logoutBtn.id = 'logoutBtn';
               logoutBtn.textContent = 'Logout';
               logoutBtn.className = 'nav-btn';
-              logoutBtn.style.marginLeft = 'auto';
               logoutBtn.onclick = () => {
                 localStorage.removeItem('isStaff');
                 window.location.replace('/');
@@ -57,26 +48,6 @@
         } // if
       }, 100);
     })();
-
-    // display instrument information if card selected
-    function showDetails(name, model, status, notes) {
-      const panel = document.getElementById('detailsPanel');
-      const content = document.getElementById('detailsContent');
-      // info displayed [FIX: will be edited to include more later]
-      content.innerHTML = `
-                <h2>${name}</h2>
-                <p><strong>Model:</strong> ${model}</p>
-                <p><strong>Status:</strong> ${status}</p>
-                <hr>
-                <p><strong>Notes:</strong><br>${notes}</p>
-            `;
-      panel.classList.add('active');
-    } // showDetails
-
-    // hide instrument information if close selected
-    function hideDetails() {
-      document.getElementById('detailsPanel').classList.remove('active');
-    } // hideDetails
   </script>
 </head>
 
@@ -96,32 +67,111 @@
     <div class="dashboard-box">
       <!-- top tool area; contains search and all those buttons nearby -->
       <div class="toolbar">
-        <input type="text" id="dashboardSearch" placeholder="Search for instruments..." onkeyup="filterDash()">
-        <div class="filter-group">
-          <button onclick="filterCategory('search')">Search</button>
-          <button onclick="filterCategory('filter')">Filter</button>
+        <!-- normal searching -->
+        <div class="search-container">
+          <input type="text" id="dashboardSearch" placeholder="Search by name, type, make, or model..."
+            onkeyup="applyFilters()">
+          <!-- advanced searching -->
+          <button type="button" class="filter-btn" onclick="openAdvancedModal()">
+            Advanced
+          </button>
         </div>
+        <div id="staffActions" class="update-group"></div>
       </div>
 
       <!-- instrument containers/cards -->
       <div class="dashboard-main-content">
-        <div class="scroll-container" style="flex: 1; overflow-y: auto; padding-right: 10px;">
-          <div class="instrument-grid" id="instrument-grid">
+        <div class="scroll-container">
+          <div id="instrument-grid" class="instrument-grid">
             <p>Loading instruments from database...</p>
           </div>
         </div>
 
         <!-- instrument info panel -->
-        <div id="detailsPanel" class="details-panel">
-          <button class="close-btn" onclick="hideDetails()">&times;</button>
-          <div id="detailsContent">
-            <div class="placeholder-state" style="text-align: center; margin-top: 100px; color: #aaa;">
-              <!-- <div style="font-size: 3rem; margin-bottom: 10px;">...</div>
-              <p>Select an instrument<br>to view maintenance logs and details.</p> -->
+        <div id="details-sidebar" class="details-panel">
+          <div id="sidebar-inner-container">
+            <!-- contains the top card part with the status, pic, and name -->
+            <div class="header-card">
+              <div class="instrument-visual-large">
+                <div id="detail-picture-container"
+                  style="width:100%; height:100%; background-size:cover; background-position:center; border-radius:10px; display:none;">
+                </div>
+                <span id="detail-icon" style="display:block;"></span>
+              </div>
+              <div class="header-text-large">
+                <h2 id="detail-name">---</h2>
+                <span id="detail-status-badge" class="status-indicator-pill">---</span>
+                <button class="close-btn" onclick="closeDetails()">&times;</button>
+              </div>
+            </div>
+
+            <!-- this is the tab divider -->
+            <div class="sidebar-header">
+              <div class="sidebar-tabs">
+                <button id="tab-details" class="tab-btn active" onclick="switchTab('details')">Details</button>
+                <button id="tab-manage" class="tab-btn" onclick="switchTab('manage')">Manage</button>
+              </div>
+            </div>
+
+            <!-- divided general info into public and staff-restricted ids; all is stored in the
+             "details" tab -->
+            <div id="details-content" class="tab-pane active">
+              <div class="details-grid">
+                <div id="public-info">
+                  <div class="detail-item"><strong>Type</strong><span id="detail-type">---</span></div>
+                  <div class="detail-item"><strong>Make</strong><span id="detail-make">---</span></div>
+                  <div class="detail-item"><strong>Grade</strong><span id="detail-grade">---</span></div>
+                  <div class="detail-item"><strong>Model</strong><span id="detail-model">---</span></div>
+                  <div class="detail-item"><strong>Serial #</strong><span id="detail-serial">---</span></div>
+                  <div class="detail-item"><strong>Price</strong><span id="detail-price">---</span></div>
+                </div>
+
+                <div id="staff-only-info">
+                  <div class="detail-item" data-staff-only="true"><strong>Location</strong><span
+                      id="detail-stored">---</span></div>
+                  <div class="detail-item"><strong>Dept</strong><span id="detail-dept">---</span></div>
+                  <div class="detail-item" data-staff-only="true"><strong>Old ID</strong><span
+                      id="detail-oldid">---</span>
+                  </div>
+                  <div class="detail-item" data-staff-only="true"><strong>Notes</strong><span
+                      id="detail-notes">N/A</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- handles checkout/in functions in "manage" tab -->
+            <div id="manage-content" class="tab-pane" style="display: none;">
+              <div id="checkout-form" class="info-box">
+                <h3>Checkout</h3>
+                <div class="filter-field">
+                  <label>Student Email</label>
+                  <input type="email" id="checkout-email" placeholder="username@grinnell.edu">
+                </div>
+                <div class="filter-field">
+                  <label>Due Date</label>
+                  <input type="date" id="checkout-due">
+                </div>
+                <!-- FIX: should migrate styling to .css -->
+                <button class="btn-primary" onclick="processTransaction('checkout')"
+                  style="width:100%; margin-top:10px;">
+                  Confirm Checkout
+                </button>
+              </div>
+
+              <div id="checkin-form" class="info-box" style="display:none;">
+                <h3>Return Instrument</h3>
+                <p id="loan-info"></p>
+                <button class="btn-primary" onclick="processTransaction('checkin')"
+                  style="width:100%; background-color: #28a745;">
+                  Confirm Return
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   </main>
 
@@ -150,6 +200,49 @@
           style="grid-column: span 2; background:var(--ol); color:white; font-weight:bold; padding:12px;">Save to
           Database</button>
       </form>
+    </div>
+  </div>
+
+  <!-- advanced filtering stuff -->
+  <div id="advancedFilterModal" class="modal">
+    <div class="modal-content filter-size">
+      <span class="close" onclick="closeAdvancedModal()">&times;</span>
+      <h2>Advanced Filter</h2>
+
+      <div class="filter-form">
+        <div class="filter-field">
+          <label>Type</label>
+          <input type="text" id="adv_Type" placeholder="e.g. Cello" oninput="applyFilters()">
+        </div>
+        <div class="filter-field">
+          <label>Make</label>
+          <input type="text" id="adv_Make" placeholder="e.g. Yamaha" oninput="applyFilters()">
+        </div>
+        <div class="filter-field">
+          <label>Grade</label>
+          <input type="text" id="adv_Grade" placeholder="A, B, C" oninput="applyFilters()">
+        </div>
+        <div class="filter-field">
+          <label>Location</label>
+          <input type="text" id="adv_Loc" placeholder="Locker #" oninput="applyFilters()">
+        </div>
+        <div class="filter-field full-width">
+          <label>Serial Number</label>
+          <input type="text" id="adv_Serial" placeholder="Partial serial..." oninput="applyFilters()">
+        </div>
+
+        <div class="price-slider-group">
+          <div class="price-header">
+            <label>Price Range</label>
+            <span id="priceDisplay" class="price-display">Max Price: $9999</span>
+          </div>
+          <input type="range" id="adv_PriceMax" class="slider" min="0" max="9999" value="9999"
+            oninput="updatePriceLabel(this.value)">
+        </div>
+
+        <button class="btn-secondary" onclick="resetAllFilters()">Reset</button>
+        <button class="btn-primary" onclick="closeAdvancedModal()">Done</button>
+      </div>
     </div>
   </div>
 
