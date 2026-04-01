@@ -80,7 +80,8 @@ async function processTransaction(type) {
     // build payload
     const payload = {
         item_id: activeInstrument.Name_ID,
-        type: type // 'checkout' or 'checkin'
+        type: type, // 'checkout' or 'checkin'
+        role: localStorage.getItem('isStaff') === 'true' ? 'staff' : 'student'
     };
 
     // validate and add fields if we are checking out
@@ -115,7 +116,7 @@ async function processTransaction(type) {
 
         if (response.ok) {
             alert(`Instrument ${type === 'checkout' ? 'checked out' : 'returned'} successfully!`);
-            location.reload(); // Refresh to update the UI status pills
+            location.reload(); // refresh UI to show updates
         } else {
             const errorData = await response.json();
             alert("Error: " + (errorData.message || "The server could not process the transaction."));
@@ -138,6 +139,7 @@ async function loadInstruments() {
     try {
         const response = await fetch('/api/instruments');
         const instruments = await response.json();
+        console.log("First Instrument Object:", instruments[0]); // check the keys in browser console
         grid.innerHTML = ''; 
 
         instruments.forEach(item => {
@@ -177,7 +179,7 @@ async function loadInstruments() {
                     </div>
                     <div class="col-end">
                         <div class="action-zone delete-zone">
-                            <button class="mode-action-btn delete-btn" onclick="deleteInstrument('${item.Name_ID}', event)">REMOVE</button>
+                            <button class="mode-action-btn delete-btn" onclick="deleteInstrument(${item.Item_ID || item.id || item.ID}, event)">REMOVE</button>
                         </div>
                         <div class="action-zone edit-zone">
                             <button class="mode-action-btn edit-btn" onclick="openUpdateModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">MODIFY</button>
@@ -226,6 +228,7 @@ window.addEventListener('DOMContentLoaded', loadInstruments);
  * ...
  */
 function toggleEditMode() {
+    closeDetails();
     isEditMode = !isEditMode;
     const editBtn = document.getElementById('edit-mode-btn');
     if (isEditMode) {
@@ -245,6 +248,7 @@ function toggleEditMode() {
  * ...
  */
 function toggleDeleteMode() {
+    closeDetails();
     isDeleteMode = !isDeleteMode;
     const deleteBtn = document.getElementById('delete-mode-btn');
     if (isDeleteMode) {
@@ -362,18 +366,25 @@ async function deleteInstrument(id, event) {
     if (!confirm(`Confirm deletion of instrument #${id}?`)) return;
     try {
         const response = await fetch(`/api/instruments/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                role: localStorage.getItem('isStaff') === 'true' ? 'staff' : 'student'
+            })
         });
 
         if (response.ok) {
             // remove entry, turn delete mode off
-            event.target.closest('.instrument-card').remove();
-            toggleDeleteMode(); 
+            const card = event.target.closest('.instrument-card');
+            if (card) card.remove();
+            toggleDeleteMode();
         } else {
-            alert("Delete failed on server.");
+            const errorData = await response.json();
+            alert("Delete failed: " + (errorData.message || "Unauthorized action."));
         } // elif
     } catch (err) {
         console.error("Error:", err);
+        alert("Failed to connect to the server.");
     } // try/catch
 } // deleteInstrument
 
@@ -558,5 +569,6 @@ function closeDetails() {
     if (sidebar) {
         sidebar.classList.remove('open');
     } // if
+    activeInstrument = null; // clear the global ref
     document.querySelectorAll('.instrument-card').forEach(c => c.classList.remove('selected-card'));
 } // closeDetails

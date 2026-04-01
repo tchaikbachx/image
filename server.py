@@ -149,7 +149,7 @@ def update_instrument_endpoint(instrument_id):
 @app.route('/api/transaction', methods=['POST'])
 def handle_transaction():
     data = request.json
-    user_role = data.json.get('role') 
+    user_role = data.get('role') 
     
     # CODE 403: someone tried to bypass and larp as staff
     if user_role != 'staff':
