@@ -1,7 +1,8 @@
 import sys
+import os
 
 # add project directory to the sys.path
-project_home = u'/home/DrAgus/mysite'
+project_home = os.path.dirname(os.path.abspath(__file__))
 if project_home not in sys.path:
     sys.path = [project_home] + sys.path
 
