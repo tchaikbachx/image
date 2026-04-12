@@ -21,6 +21,7 @@ import sqlite3
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
+sys.path.insert(0, os.path.dirname(__file__))
 
 # import all the local dependencies
 from mirror.add_instrument import add_instrument as group_add_logic
