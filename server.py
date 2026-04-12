@@ -36,7 +36,7 @@ CORS(app)
 
 # get the correct paths for database connection
 def get_db_connection():
-    db_path = os.path.join(os.path.dirname(__file__), 'mirror', 'database.db')
+    db_path = os.path.join(BASE_DIR, 'mirror', 'database.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -50,13 +50,13 @@ def get_db_connection():
 # get the path to the homepage
 @app.route('/')
 def index():
-    return send_from_directory('templates', 'index.html')
+    return send_from_directory(os.path.join(BASE_DIR, 'templates'), 'index.html')
 
 
 # get the path to the dashboard
 @app.route('/dashboard')
 def dash():
-    return send_from_directory('templates', 'dash.html')
+    return send_from_directory(os.path.join(BASE_DIR, 'templates'), 'dash.html')
 
 
 # get the path to any dependencies of index or dash (i.e., script & style)
@@ -205,3 +205,5 @@ if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     print(f"opened at http://0.0.0.0:{port}")
     app.run(host='0.0.0.0', port=port)
+
+application = app
