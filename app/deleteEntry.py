@@ -1,4 +1,3 @@
-import sys
 import sqlite3
 
 # connect to the database file
@@ -7,14 +6,11 @@ cur = db.cursor()
 
 # deleteEntry(table: str, ID: int):
 # deletes a row of table `table` with ID `ID`
-def deleteEntry(table: str, ID: int):
+def deleteEntry(conn: Connection, table: str, ID: int):
+    # set cursor for db interaction
+    cur = conn.cursor()
+
     cur.execute("DELETE " + table + " WHERE ID = " + str(ID))
 
-# call function with passed arguments
-deleteEntry(str(sys.argv[1]), int(sys.argv[2]))
-
-# commit changes to db file
-db.commit()
-
-# close db connection
-db.close()
+    # commit changes to db file
+    conn.commit()
