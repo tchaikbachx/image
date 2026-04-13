@@ -14,7 +14,7 @@ cur = db.cursor()
 def exportAsCSV(tableName: str):
     # export the table as a csv file
     # df = pd.read_sql_query("SELECT * FROM " + tableName, db)
-    df = pd.read_sql_query("SELECT * FROM borrower", db)
+    df = pd.read_sql_query("SELECT * FROM " + tableName, db)
     df.to_csv( "output_file.csv", index=False)
 
 
