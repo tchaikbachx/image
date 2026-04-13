@@ -2,6 +2,8 @@
     |  DASHBOARD   |
     +----- --------+-->
 
+<!-- MOVE SCRIPTS TO EXTERNAL FILES TO MAINTAIN PURE HTML INFRASTRUCTURE -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,7 +29,7 @@
             document.body.setAttribute('data-logged-in', 'true');
             staffContainer.innerHTML = `
           <button type="button" id="addInstrumentBtn" onclick="openAddModal()">🞣</button>
-          <button type="button" id="delete-mode-btn" onclick="toggleDeleteMode()">♳</button>
+          <button type="button" id="delete-mode-btn" onclick="toggleDeleteMode()">🞪</button>
           <button type="button" id="edit-mode-btn" onclick="toggleEditMode()">✎</button>
         `;
             // deal with adding logout to navbar cleanly
