@@ -2,10 +2,6 @@ import sqlite3
 
 import updateIfNotNull
 
-# connect to the database file
-db = sqlite3.connect("database.db")
-cur = db.cursor()
-
 # updateKkey(ID: int, Name_ID: str, Qty: int, Description: str):
 # updates a Kkey record with given fields in the database
 def updateKkey(conn: Connection, ID: int, Name_ID: str, Qty: int, Description: str):
@@ -16,3 +12,6 @@ def updateKkey(conn: Connection, ID: int, Name_ID: str, Qty: int, Description: s
 
     # commit changes to db file
     conn.commit()
+
+    # empty table check
+    return cur.rowcount > 0

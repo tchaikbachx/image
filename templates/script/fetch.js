@@ -137,7 +137,7 @@ async function loadInstruments() {
     if (!grid) return;
 
     try {
-        const response = await fetch('/api/instruments');
+        const response = await fetch('/api/instrument');
         const instruments = await response.json();
         console.log("First Instrument Object:", instruments[0]); // check the keys in browser console
         grid.innerHTML = ''; 
@@ -316,7 +316,7 @@ async function submitUpdate() {
 
     try {
         // send put server request, hopefully it goes through
-        const response = await fetch(`/api/instruments/${currentEditId}`, {
+        const response = await fetch(`/api/instrument/${currentEditId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedData)
@@ -365,7 +365,7 @@ async function deleteInstrument(id, event) {
     if (event) event.stopPropagation();
     if (!confirm(`Confirm deletion of instrument #${id}?`)) return;
     try {
-        const response = await fetch(`/api/instruments/${id}`, {
+        const response = await fetch(`/api/instrument/${id}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -451,7 +451,7 @@ async function submitNewInstrument() {
 
     // send payload data to the server
     try {
-        const response = await fetch('/api/instruments', {
+        const response = await fetch('/api/instrument', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

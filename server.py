@@ -111,14 +111,108 @@ def get_instruments():
     return jsonify(instruments)
 
 
-# add an instrument to the database
-@app.route('/api/instruments', methods=['POST'])
-def add_instrument_endpoint():
+##################
+# ADDING ENTRIES #
+##################
+
+# add a borrower to the database
+@app.route('/api/borrower', methods=['POST'])
+def add_borrower_endpoint():
     data = request.get_json()
-    # try to load all the instruments if there are any
     try:
         conn = get_db_connection()
-        new_id = group_add_logic(data, conn)
+        new_id = aBorr(conn, data.get('Email'))
+        # CODE 201: successfully added a new entry
+        return jsonify({"status": "success", "id": new_id}), 201
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# add a broken instrument to the database
+@app.route('/api/broken', methods=['POST'])
+def add_broken_endpoint():
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        new_id = aBrok(conn, data.get('Item_ID'), data.get('Description'))
+        # CODE 201: successfully added a new entry
+        return jsonify({"status": "success", "id": new_id}), 201
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# add a checkout to the database
+@app.route('/api/checkout', methods=['POST'])
+def add_checkout_endpoint():
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        new_id = aChec(conn, data.get('Borrower_ID'), data.get('Item_ID'), data.get('Due_Date'))
+        # CODE 201: successfully added a new entry
+        return jsonify({"status": "success", "id": new_id}), 201
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# add a department to the database
+@app.route('/api/department', methods=['POST'])
+def add_department_endpoint():
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        new_id = aDepa(conn, data.get('Department_Name'))
+        # CODE 201: successfully added a new entry
+        return jsonify({"status": "success", "id": new_id}), 201
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# add an instrument to the database
+@app.route('/api/instrument', methods=['POST'])
+def add_instrument_endpoint():
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        new_id = aInst(conn, data.get('Name_ID'), data.get('Old_ID'), data.get('Type'), data.get('Grade'), data.get('Make'), data.get('Model'), data.get('Picture'), data.get('Serial_Number'), data.get('Price'), data.get('Stored_In'), data.get('Dept'))
+        # CODE 201: successfully added a new entry
+        return jsonify({"status": "success", "id": new_id}), 201
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# add a (k)key to the database
+@app.route('/api/kkey', methods=['POST'])
+def add_kkey_endpoint():
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        new_id = aKkey(conn, data.get('Name_ID'), data.get('Qty'), data.get('Description'))
+        # CODE 201: successfully added a new entry
+        return jsonify({"status": "success", "id": new_id}), 201
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# add a locker to the database
+@app.route('/api/locker', methods=['POST'])
+def add_locker_endpoint():
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        new_id = aLock(conn, data.get('Name_ID'), data.get('Combo'), data.get('Kkey'), data.get('Checkoutable'))
+        # CODE 201: successfully added a new entry
+        return jsonify({"status": "success", "id": new_id}), 201
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# add a missing instrument to the database
+@app.route('/api/missing', methods=['POST'])
+def add_missing_endpoint():
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        new_id = aMiss(conn, data.get('Item_ID'), data.get('Description'))
         # CODE 201: successfully added a new entry
         return jsonify({"status": "success", "id": new_id}), 201
     except Exception as e:
@@ -126,13 +220,132 @@ def add_instrument_endpoint():
         return jsonify({"status": "error", "message": str(e)}), 500
     
 
+####################
+# UPDATING ENTRIES #
+####################
+
+# update the information about a borrower in the database
+@app.route('/api/borrower/<int:entry_id>', methods=['PUT'])
+def update_borrower_endpoint(entry_id):
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        success = uBorr(conn, entry_id, data.get('Email'))
+        conn.close()
+        # CODE 200: success
+        return jsonify({"status": "success" if success else "no change"}), 200
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# update the information about a broken instrument in the database
+@app.route('/api/broken/<int:entry_id>', methods=['PUT'])
+def update_broken_endpoint(entry_id):
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        success = uBrok(conn, entry_id, data.get('Date_Broken'), data.get('Date_Fixed'), data.get('Item_ID'), data.get('Description'))
+        conn.close()
+        # CODE 200: success
+        return jsonify({"status": "success" if success else "no change"}), 200
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# update the information about a checkout in the database
+@app.route('/api/checkout/<int:entry_id>', methods=['PUT'])
+def update_checkout_endpoint(entry_id):
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        success = uChec(conn, entry_id, data.get('Borrower_ID'), data.get('Item_ID'), data.get('Checkout_Date'), data.get('Due_Date'), data.get('Closed_Date'))
+        conn.close()
+        # CODE 200: success
+        return jsonify({"status": "success" if success else "no change"}), 200
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# update the information about a department in the database
+@app.route('/api/department/<int:entry_id>', methods=['PUT'])
+def update_department_endpoint(entry_id):
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        success = uDepa(conn, entry_id, data.get('Department_Name'))
+        conn.close()
+        # CODE 200: success
+        return jsonify({"status": "success" if success else "no change"}), 200
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# update the information about an instrument in the database
+@app.route('/api/instrument/<int:entry_id>', methods=['PUT'])
+def update_instrument_endpoint(entry_id):
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        success = uInst(conn, entry_id, data.get('Name_ID'), data.get('Old_ID'), data.get('Type'), data.get('Grade'), data.get('Make'), data.get('Model'), data.get('Picture'), data.get('Serial_Number'), data.get('Price'), data.get('Stored_In'), data.get('Dept'))
+        conn.close()
+        # CODE 200: success
+        return jsonify({"status": "success" if success else "no change"}), 200
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# update the information about a (k)key in the database
+@app.route('/api/kkey/<int:entry_id>', methods=['PUT'])
+def update_kkey_endpoint(entry_id):
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        success = uKkey(conn, entry_id, data.get('Name_ID'), data.get('Qty'), data.get('Description'))
+        # CODE 200: success
+        return jsonify({"status": "success" if success else "no change"}), 200
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# update the information about a locker in the database
+@app.route('/api/locker/<int:entry_id>', methods=['PUT'])
+def update_locker_endpoint(entry_id):
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        success = uLock(conn, entry_id, data.get('Name_ID'), data.get('Combo'), data.get('Kkey'), data.get('Checkoutable'))
+        # CODE 200: success
+        return jsonify({"status": "success" if success else "no change"}), 200
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# update the information about a missing instrument in the database
+@app.route('/api/missing/<int:entry_id>', methods=['PUT'])
+def update_missing_endpoint(entry_id):
+    data = request.get_json()
+    try:
+        conn = get_db_connection()
+        success = uMiss(conn, entry_id, data.get('Date_Missing'), data.get('Date_Found'), data.get('Item_ID'), data.get('Description'))
+        # CODE 200: success
+        return jsonify({"status": "success" if success else "no change"}), 200
+    except Exception as e:
+        # CODE 500: uh oh something went wrong here
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+####################
+# DELETING ENTRIES #
+####################
+
 # remove an instrument from the database
-@app.route('/api/instruments/<int:instrument_id>', methods=['DELETE'])
-def delete_instrument_endpoint(instrument_id):
+@app.route('/api/<str:table>/<int:entry_id>', methods=['DELETE'])
+def delete_endpoint(table, entry_id):
     # try to load all the instruments if there are any
     try:
         conn = get_db_connection()
-        success = group_delete_logic(instrument_id, conn)
+        success = deleteEntry(conn, table, entry_id)
         conn.close()
         
         if success:
@@ -140,22 +353,7 @@ def delete_instrument_endpoint(instrument_id):
             return jsonify({"status": "success"}), 200
         else:
             # CODE 404: did not find in database or accessing wrong db
-            return jsonify({"status": "error", "message": "Instrument not found"}), 404
-    except Exception as e:
-        # CODE 500: uh oh something went wrong here
-        return jsonify({"status": "error", "message": str(e)}), 500
-    
-
-# update the information about an instrument in the database
-@app.route('/api/instruments/<int:instrument_id>', methods=['PUT'])
-def update_instrument_endpoint(instrument_id):
-    data = request.get_json()
-    try:
-        conn = get_db_connection()
-        success = group_update_logic(instrument_id, data, conn)
-        conn.close()
-        # CODE 200: success
-        return jsonify({"status": "success" if success else "no change"}), 200
+            return jsonify({"status": "error", "message": "Item not found"}), 404
     except Exception as e:
         # CODE 500: uh oh something went wrong here
         return jsonify({"status": "error", "message": str(e)}), 500

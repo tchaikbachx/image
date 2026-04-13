@@ -2,10 +2,6 @@ import sqlite3
 
 import updateIfNotNull
 
-# connect to the database file
-db = sqlite3.connect("database.db")
-cur = db.cursor()
-
 # updateInstrument(ID: int, Name_ID: str, Old_ID: str, Type: str, Grade: str, Make: str, Model: str, Picture: str, Serial_Number: str, Price: float, Stored_In: int, Dept: int)
 # updates an instrument record with given fields in the database
 def updateInstrument(conn: Connection, ID: int, Name_ID: str, Old_ID: str, Type: str, Grade: str, Make: str, Model: str, Picture: str, Serial_Number: str, Price: float, Stored_In: int, Dept: int):
@@ -16,3 +12,6 @@ def updateInstrument(conn: Connection, ID: int, Name_ID: str, Old_ID: str, Type:
 
     # commit changes to db file
     conn.commit()
+
+    # empty table check
+    return cur.rowcount > 0

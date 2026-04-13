@@ -2,10 +2,6 @@ import sqlite3
 
 import updateIfNotNull
 
-# connect to the database file
-db = sqlite3.connect("database.db")
-cur = db.cursor()
-
 # updateCheckout(ID: int, Borrower_ID: int, Item_ID: int, Checkout_Date: str, Due_Date: str, Closed_Date: str):
 # updates a checkout item record with given fields in the database
 def updateCheckout(conn: Connection, ID: int, Borrower_ID: int, Item_ID: int, Checkout_Date: str, Due_Date: str, Closed_Date: str):
@@ -16,3 +12,6 @@ def updateCheckout(conn: Connection, ID: int, Borrower_ID: int, Item_ID: int, Ch
 
     # commit changes to db file
     conn.commit()
+
+    # empty table check
+    return cur.rowcount > 0

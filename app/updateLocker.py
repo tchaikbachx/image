@@ -2,10 +2,6 @@ import sqlite3
 
 import updateIfNotNull
 
-# connect to the database file
-db = sqlite3.connect("database.db")
-cur = db.cursor()
-
 # updateLocker(ID: int, Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
 # updates a locker record with given fields in the database
 def updateLocker(conn: Connection, ID: int, Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
@@ -16,3 +12,6 @@ def updateLocker(conn: Connection, ID: int, Name_ID: str, Combo: str, Kkey: int,
 
     # commit changes to db file
     conn.commit()
+
+    # empty table check
+    return cur.rowcount > 0

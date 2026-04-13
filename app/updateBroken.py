@@ -2,10 +2,6 @@ import sqlite3
 
 import updateIfNotNull
 
-# connect to the database file
-db = sqlite3.connect("database.db")
-cur = db.cursor()
-
 # updateBroken(ID: int, Date_Broken: str, Date_Fixed: str, Item_ID: int, Description: str):
 # updates a broken item record with given fields in the database
 def updateBroken(conn: Connection, ID: int, Date_Broken: str, Date_Fixed: str, Item_ID: int, Description: str):
@@ -16,3 +12,6 @@ def updateBroken(conn: Connection, ID: int, Date_Broken: str, Date_Fixed: str, I
 
     # commit changes to db file
     conn.commit()
+
+    # empty table check
+    return cur.rowcount > 0

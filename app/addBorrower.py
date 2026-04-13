@@ -9,10 +9,13 @@ def addBorrower(conn: Connection, Email: str):
     # fetch latest ID to populate the new ID field with
     prevID = cur.execute("SELECT ID FROM borrower ORDER BY ID DESC LIMIT 1")
     prevID = cur.fetchone()[0]
+    newID = str(prevID + 1 if prevID != None else 1)
 
     # str() everything else
     Email = str(Email)
-    cur.execute("INSERT INTO borrower VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Email + "\')")
+    cur.execute("INSERT INTO borrower VALUES (" + newID + ",\'" + Email + "\')")
 
     # commit changes to db file
     conn.commit()
+
+    return newID

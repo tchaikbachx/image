@@ -12,3 +12,6 @@ def updateMissing(conn: Connection, ID: int, Date_Missing: str, Date_Found: str,
 
     # commit changes to db file
     conn.commit()
+
+    # empty table check
+    return cur.rowcount > 0
