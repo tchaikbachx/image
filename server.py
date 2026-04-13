@@ -23,9 +23,25 @@ from flask_cors import CORS
 
 
 # import all the local dependencies
-from mirror.add_instrument import add_instrument as group_add_logic
-from mirror.delete_instrument import delete_instrument as group_delete_logic
-from mirror.update_instrument import update_instrument as group_update_logic
+from app.addBorrower import addBorrower as aBorr
+from app.addBroken import addBroken as aBrok
+from app.addCheckout import addCheckout as aChec
+from app.addDepartment import addDepartment as aDepa
+from app.addInstrument import addInstrument as aInst
+from app.addKkey import addKkey as aKkey
+from app.addLocker import addLocker as aLock
+from app.addMissing import addMissing as aMiss
+
+from app.updateBorrower import updateBorrower as uBorr
+from app.updateBroken import updateBroken as uBrok
+from app.updateCheckout import updateCheckout as uChec
+from app.updateDepartment import updateDepartment as uDepa
+from app.updateInstrument import updateInstrument as uInst
+from app.updateKkey import updateKkey as uKkey
+from app.updateLocker import updateLocker as uLock
+from app.updateMissing import updateMissing as uMiss
+
+from app.deleteEntry import deleteEntry
 
 
 app = Flask(__name__)
