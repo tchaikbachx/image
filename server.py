@@ -84,12 +84,60 @@ def send_template_assets(folder, filename):
 # |                                                           DYNAMIC ROUTING  |
 # +----------------------------------------------------------------------------+
 
+##################
+# GETTING TABLES #
+##################
+
+@app.route('/api/borrower', methods=['GET'])
+def get_borrower():
+    conn = get_db_connection() 
+    cur = conn.cursor()
+    
+    cur.execute("SELECT * FROM borrower")
+    getRows = [dict(row) for row in cur.fetchall()]
+    
+    conn.close()
+    return jsonify(getRows)
+
+@app.route('/api/broken', methods=['GET'])
+def get_broken():
+    conn = get_db_connection() 
+    cur = conn.cursor()
+    
+    cur.execute("SELECT * FROM broken")
+    getRows = [dict(row) for row in cur.fetchall()]
+    
+    conn.close()
+    return jsonify(getRows)
+
+@app.route('/api/checkout', methods=['GET'])
+def get_checkout():
+    conn = get_db_connection() 
+    cur = conn.cursor()
+    
+    cur.execute("SELECT * FROM checkout")
+    getRows = [dict(row) for row in cur.fetchall()]
+    
+    conn.close()
+    return jsonify(getRows)
+
+@app.route('/api/department', methods=['GET'])
+def get_department():
+    conn = get_db_connection() 
+    cur = conn.cursor()
+    
+    cur.execute("SELECT * FROM department")
+    getRows = [dict(row) for row in cur.fetchall()]
+    
+    conn.close()
+    return jsonify(getRows)
+
 
 # display all instruments in the database; i re-wrote this so that it performs
 # lookups using checkout and instrument tables; that way, it will update when
 # the server receives any changes that prompt a reload
-@app.route('/api/instruments', methods=['GET'])
-def get_instruments():
+@app.route('/api/instrument', methods=['GET'])
+def get_instrument():
     conn = get_db_connection() 
     cur = conn.cursor()
 
@@ -109,6 +157,48 @@ def get_instruments():
     
     conn.close()
     return jsonify(instruments)
+
+@app.route('/api/kkey', methods=['GET'])
+def get_kkey():
+    conn = get_db_connection() 
+    cur = conn.cursor()
+    
+    cur.execute("SELECT * FROM kkey")
+    getRows = [dict(row) for row in cur.fetchall()]
+    
+    conn.close()
+    return jsonify(getRows)
+
+@app.route('/api/locker', methods=['GET'])
+def get_locker():
+    conn = get_db_connection() 
+    cur = conn.cursor()
+    
+    cur.execute("SELECT * FROM locker")
+    getRows = [dict(row) for row in cur.fetchall()]
+    
+    conn.close()
+    return jsonify(getRows)
+
+@app.route('/api/missing', methods=['GET'])
+def get_missing():
+    conn = get_db_connection() 
+    cur = conn.cursor()
+    
+    query = """
+        SELECT i.*,
+        CASE
+            WHEN i.Date_Found IS NOT NULL THEN 'MISSING'
+            ELSE 'FOUND'
+        END as Status
+        FROM missing i
+    """
+
+    cur.execute(query)
+    getRows = [dict(row) for row in cur.fetchall()]
+    
+    conn.close()
+    return jsonify(getRows)
 
 
 ##################
