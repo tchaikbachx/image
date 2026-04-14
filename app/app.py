@@ -27,6 +27,9 @@ def initTables():
     cur.execute("CREATE TABLE IF NOT EXISTS broken(ID INT PRIMARY KEY, Date_Broken, Date_Fixed, Item_ID, Description)")
     cur.execute("CREATE TABLE IF NOT EXISTS department(ID INT PRIMARY KEY, Department_Name)")
 
+# cur.execute("DELETE FROM locker WHERE ID IS NULL")
+# print(cur.execute("SELECT * FROM locker WHERE ID IS NULL").fetchall())
+
 
 #----- FUNCTIONS ABOVE ----- CALLS BELOW -----#
 
