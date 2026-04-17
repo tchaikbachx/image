@@ -28,7 +28,7 @@ def deleteEntry(conn: Connection, table: str, ID: int):
     cur.execute("UPDATE trashcan SET col12 = \'" + str(table) + "\' WHERE ID = " + newID + ";")
     
     # actual deletion:
-    cur.execute("DELETE " + table + " WHERE ID = " + str(ID))
+    cur.execute("DELETE FROM " + table + " WHERE ID = " + str(ID))
 
     # commit changes to db file
     conn.commit()
