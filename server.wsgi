@@ -1,10 +1,8 @@
 import sys
 import os
 
-# add project directory to the sys.path
-project_home = os.path.dirname(os.path.abspath(__file__))
+project_home = "/var/www/webroot/ROOT"
 if project_home not in sys.path:
-    sys.path = [project_home] + sys.path
+    sys.path.insert(0, project_home)
 
-# import flask app but need to call it "application" for WSGI to work
-from server import app as application  # noqa
+from app import app as application
