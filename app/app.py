@@ -11,6 +11,9 @@ import datetime
 # import addLocker
 # import addMissing
 
+from flask import Flask
+
+app = Flask(__name__)
 @app.route("/")
 def home():
     return "Hello"
