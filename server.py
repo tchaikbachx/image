@@ -7,17 +7,17 @@ from manager import manager
 app = Flask(__name__)
 CORS(app)
 
-# Get the absolute path to the directory where server.py lives
+# get abs path to the directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Tell Flask explicitly where to find your files
+# have to explicitly tell for now
 app = Flask(__name__, 
             template_folder=os.path.join(BASE_DIR, 'templates'),
             static_folder=os.path.join(BASE_DIR, 'templates'))
 
 @app.route('/')
 def index():
-    # Use BASE_DIR instead of 'db' to find the folder
+    # using BASE_DIR instead
     return send_from_directory(os.path.join(BASE_DIR, 'templates'), 'index.html')
 
 @app.route('/dashboard')
