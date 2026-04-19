@@ -13,12 +13,12 @@ import addLocker
 import emptyTrash
 import deleteEntry
 
-# from flask import Flask
+from flask import Flask
 
-# app = Flask(__name__)
-# @app.route("/")
-# def home():
-#     return "Hello"
+app = Flask(__name__)
+@app.route("/")
+def home():
+    return "Hello"
     
 # connect to the database file
 db = sqlite3.connect("database.db")
