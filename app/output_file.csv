@@ -1,1 +1,224 @@
-ID,Department_Name
+ID,Name_ID,Old_ID,Type,Grade,Make,Model,Picture,Serial_Number,Price,Stored_In,Dept
+1,301,301,Baritone Horn-EUPHONIUM,grade,Gold Star,0,img,23064 (713),100.0,0,1
+2,2187,2187,Baritone Horn-EUPHONIUM,grade,Conn,19I Connstellation,img,560783,4500.0,125,1
+3,2216,2216,Baritone Horn-EUPHONIUM,grade,Bach,EUBA1110,img,1483,1595.0,170,1
+4,5005,5005,RENTAL EUPHONIUM,grade,King,2280,img,979267,,131,1
+5,310,310,Trombone,grade,Holton,0,img,Bell: 99016 (705); Slide: 101416,100.0,48,1
+6,311,311,TROMBONE-Tenor,grade,Yamaha,YSL-352s,img,Bell: 017399; Slide: 405549,500.0,85,1
+7,2218,2218,TROMBONE-Tenor,grade,Bach,TRBA36BO,img,138865,1500.0,87,1
+8,2217,2217,TROMBONE-Bass,grade,Bach,TRBA50B30,img,144568,2130.0,86,1
+9,314,314,TUBA,grade,Yamaha,YBB201,img,002114  (630?),675.0,195,1
+10,2225,2225,TUBA,grade,Yamaha,TUYAYBB641,img,14436,4925.0,185,1
+11,5500,5500,TUBA,grade,Miraphone,Bbb 191,img,9038516,12439.0,189,1
+12,2025,2025,Euphonium ,grade,Wessex,Bb Dolce EP100,img,,,126,1
+13,43,43,Trumpet D - Eb,grade,Yamaha,YTR 6610S,img,1632,1545.0,46,1
+14,44,44,Trumpet D - Eb,grade,Yamaha,YTR 6610S,img,1652,1545.0,47,1
+15,312,312,Trumpet Bb,grade,Le Blanc,0,img,10402,375.0,214,1
+16,313,313,Trumpet Bb,grade,Holton and Co.,Al Hirt special,img,444532,200.0,197,1
+17,2222,2222,Trumpet Bb,grade,Bach,TRBA180S37,img,500255,1340.0,65,1
+18,2712,2712,Trumpet Bb,grade,Bach,TRBA180S37,img,557004,1400.0,208,1
+19,974,974,FLUGELHORN,grade,Yamaha,YFH-631,img,008801A,895.0,75,1
+20,4013,4013,FLUGELHORN,grade,Yamaha,YFH-631G,img,456541,1550.0,75,1
+21,302,302,French horn,grade,Conn,6D,img,618422 (601); in case #602,425.0,0,1
+22,303,303,French horn,grade,Conn,0,img,E-10702 (602); in case #601    ,650.0,83,1
+23,304,304,French horn,grade,Conn,200D,img,N40192,800.0,82,1
+24,2223,2223,French horn,grade,Holton,HOHOH179,img,669161,2289.0,173,1
+25,2396,2396,French horn,grade,Holton,HOHOH179,img,675590,200.0,149,1
+26,2711,2711,French horn,grade,Holton,HOHOH179,img,680737,2385.0,169,1
+27,3578,3578,French horn,grade,Conn,8D,img,L97532,3565.0,167,1
+28,3579,3579,French horn,grade,Conn,8D,img,L68628,3975.0,168,1
+29,638,638,CLARINET-Bb,grade,no label,0,img,H7358/715,250.0,41,1
+30,639,639,CLARINET-Bb,grade,Buffet ,C12,img,256285,535.0,24,1
+31,640,640,CLARINET-Bb,grade,Bundy,0,img,184453,200.0,30,1
+32,641,641,CLARINET-Bb,grade,Bundy--Resonite/Selmer,0,img,595489,175.0,7,1
+33,2221,2221,CLARINET-Bb,grade,Buffett,CLBUR13 // bc1131-5,img,453234,2165.0,27,1
+34,2399,2399,CLARINET-Bb,grade,Buffet Crampon & Cie,BC1131-5,img,462537,,26,1
+35,3756,3756,CLARINET-Bb,grade,Yamaha,YCL-450,img,21310781,2130.0,12,1
+36,635,635,CLARINET-A,grade,Buffet; Evette and Schaeffer,0,img,D3327/433,270.0,9,1
+37,636,636,CLARINET-A,grade,Buffet; Evette and Schaeffer,0,img,D3084/435,270.0,17,1
+38,637,637,CLARINET-A,grade,Buffet; Evette and Schaeffer,0,img,D3101/434,270.0,18,1
+39,2473,2473,CLARINET-A,grade,Buffet Crampon & Cie,PL 1231-5-0,img,440875,1945.0,28,1
+40,2474,2474,CLARINET-A,grade,Buffet Crampon & Cie,PL 1231-5-0,img,440894,1945.0,29,1
+41,973,973,CLARINET-Eb,grade,Buffet ,R-13,img,293452,2325.0,22,1
+42,3217,3217,CLARINET-Eb,grade,Buffet ,BC1507-2-0,img,542175,5134.0,11,1
+43,642,642,CLARINET-Bass,grade,Yamaha,YCL-621 ,img,O2337,2257.0,52,1
+44,2715,2715,CLARINET-Bass,grade,Buffet,Prestige 400,img,35330,4446.0,129,1
+45,2336,2336,CLARINET-Contrabass,grade,Vito,CLVI7182,img,4782E,2695.0,153,1
+46,631,631,BASSOON,grade,Tam,0,img,6656/501,480.0,204,1
+47,632,632,BASSOON,grade,Kohlert,0,img,249071/508,500.0,212,1
+48,633,633,BASSOON,grade,Schreiber,554  -  with Whisper key,img,17980/508.1,1332.0,71,1
+49,2247,2247,BASSOON,grade,Fox,Renard 220 Artist,img,29257,5123.0,215,1
+50,2881,2881,BASSOON,grade,Fox Renard,III,img,33879,3775.0,69,1
+51,5504,5504,BASSOON,grade,Fox,Renard 222,img,68762,7425.0,68,1
+52,643,643,English Horn,grade,Noblet,0,img,83/429,480.0,31,1
+53,2510,2510,English Horn,grade,Fox,510,img,135,5500.0,178,1
+54,189,189,OBOE,grade,Fox,330,img,13298,2600.0,40,1
+55,646,646,OBOE,grade,Caputo,0,img,11936/425,600.0,0,1
+56,647,647,OBOE,grade,Rigoutat,0,img,023x,600.0,0,1
+57,3296,3296,OBOE,grade,Loree,c+3,img,QP 42,6727.0,42,1
+58,42,42,SAX-Alto,grade,Bundy/Selmer,0,img,689025,700.0,205,1
+59,648,648,SAX-Alto,grade,Buescher/Elkhart - Indiana,0,img,86421-21A,500.0,202,1
+60,649,649,SAX-Alto,grade,Buescher,Aristocrat,img,692245,700.0,196,1
+61,3456,3456,SAX-Alto,grade,Yamaha,YAS-23,img,256720A,500.0,196,1
+62,3457,3457,SAX-Alto,grade,Yamaha,YAS-62II ,img,0,3918.0,174,1
+63,3680,3680,SAX-Alto,grade,Yamaha,YAS-480,img,21T85304,2390.0,60,1
+64,3681,3681,SAX-Alto,grade,Yamaha,YAS-480,img,21T85515,2390.0,61,1
+65,3757,3757,SAX-Alto,grade,Yamaha,YAS-580AL,img,21M76956,1891.0,49,1
+66,653,653,SAX-Tenor,grade,Conn,10M,img,325297/526,250.0,0,1
+67,654,654,Broken-SAX-Tenor,grade,Yamaha,Yts-21,img,004947/528,350.0,89,1
+68,2224,2224,SAX-Tenor,grade,Selmer,SASE64,img,579677,3725.0,123,1
+69,3458,3458,SAX-Tenor,grade,Yamaha,YTS-62II,img,C94439,2708.0,176,1
+70,3758,3758,SAX-Tenor,grade,Yamaha,YTS-580AL,img,21M75799,2171.0,124,1
+71,972,972,SAX-Soprano,grade,Yamaha,YSS-675,img,2921,2500.0,213,1
+72,2854,2854,SAX-Soprano,grade,Yamaha,YSS-675,img,5004,2699.0,164,1
+73,651,651,SAX-Baritone,grade,Yamaha,YBS-62,img,1623,4775.0,191,1
+74,2208,2208,SAX-Baritone,grade,Yamaha,YBS-62,img,10929,4775.0,187,1
+75,3216,3216,SAX-Baritone,grade,Yamaha,YBS-62,img,12681,5800.0,143,1
+76,644,644,FLUTE,grade,Gemeinhardt,M2,img,B38271,400.0,38,1
+77,645,645,FLUTE,grade,Selmer-Signet,0,img,22524,250.0,37,1
+78,2981,2981,FLUTE,grade,Yamaha,Silver461II/925,img,301284,1100.0,5,1
+79,3667,3667,FLUTE,grade,Jupiter,JFL-507,img,P68180,402.0,19,1
+80,3668,3668,FLUTE,grade,Yamaha,261,img,717645,402.0,1,1
+81,3669,3669,FLUTE,grade,Trevor James,10xE,img,50729,402.0,13,1
+82,3678,3678,FLUTE,grade,Trevor James,31CF-HROE,img,79172,1575.0,2,1
+83,3679,3679,FLUTE,grade,Trevor James,31CF-HROE,img,79173,1575.0,8,1
+84,5502,5502,FLUTE,grade,Trevor James,CV-HROE,img,212399,1597.0,14,1
+85,5503,5503,FLUTE,grade,Trevor James,CV-HROE,img,212400,1579.0,15,1
+86,899,899,PICCOLO,grade,Yamaha,YAM YPC32,img,5684,450.0,25,1
+87,2397,2397,PICCOLO,grade,Yamaha,PIYA YPC62,img,44561,1260.0,43,1
+88,3206,3206,PICCOLO,grade,M.Zentner,0,img,3805,1500.0,35,1
+89,3215,3215,PICCOLO,grade,Hammig,640/4,img,30511,4000.0,20,1
+90,2800,2800,FLUTE-ALTO,grade,Yamaha,A421,img,1785,4800.0,3,1
+91,3729,3729,FLUTE-ALTO,grade,TREVOR JAMES,AF2,img,12275,1750.0,4,1
+92,2398,2398,FLUTE-BASS,grade,Moenig,81,img,18645,2795.0,74,1
+93,3755,3755,FLUTE-BASS,grade,TREVOR JAMES,401104 Silver,img,10803,3450.0,73,1
+94,5501,5501,FLUTE-BASS,grade,TREVOR JAMES,401104 Silver,img,10974,3505.0,72,1
+95,591,591,VIOLIN,grade,Copy of Antonius Stradivarius Cremona Faciebat Anno 1672  Old German,0,img,0,2400.0,67,1
+96,592,592,VIOLIN,grade,Copy of Antonius Stradivarius (sic) Cremonensis; Faciebat Anno 1721; German,0,img,0,400.0,93,1
+97,593,593,VIOLIN,grade,Lutherie Artistique   M. Couturieux,0,img,0,1000.0,102,1
+98,594,594,VIOLIN,grade,Joseph Kloz; 1774; Mittenwald an der Iser,0,img,0,1000.0,110,1
+99,595,595,VIOLIN,grade,"Joseph A Walter (branded inside) Montclair, NJ  [Back--Jacobus  Stainer Absam; c.1658;top; sides; and scroll; 1910-1920]",0,img,9922 (registered no. w/R. Wurlitzer),800.0,92,1
+100,596,596,VIOLIN,grade,Joh. Bapt. Schweitzer; 1813 copy,0,img,0,360.0,115,1
+101,597,597,VIOLIN,grade,Roman Teller 1977; Geigenbaumeister; W.Germany,275,img,0,1600.0,105,1
+102,598,598,VIOLIN,grade,Eruth Heinrich Roth; Bubeuroth-Erlangen -1959; made in West Germany; reproduction of Antonius Stradivarius; Cremona 1700,0,img,0,900.0,58,1
+103,599,599,VIOLIN,grade,Gustav August Fischer     Gagliano Model  --1965,Gagliano Model  --1965,img,63794,420.0,96,1
+104,600,600,VIOLIN,grade,"inside says - ""1917 - Rebarred by L.H. Gager",0,img,0,350.0,98,1
+105,601,601,VIOLIN,grade,No. 503 - Oscar Hammig copy of Stainer 1912,0,img,0,3500.0,112,1
+106,983,983,VIOLIN,grade,Joseph Kreuzinger,0,img,0,2500.0,94,1
+107,984,984,VIOLIN,grade,Karl Wilhelm,0,img,0,2500.0,104,1
+108,2975,2975,VIOLIN,grade,Klotz Family - Mittenwald 1721; German,0,img,0,9500.0,0,1
+109,3689,3689,VIOLIN,grade,Carlo Lamberti ,LV14 44,img,VJY550F15,1079.0,106,1
+110,3690,3690,VIOLIN,grade,Carlo Lamberti ,LV14 44,img,VJY551F15,1079.0,107,1
+111,3699,3699,VIOLIN,grade,Carlo Lamberti ,LV14 44,img,VJY556F15,1079.0,108,1
+112,123,123,VIOLIN,grade,Horoshi Kono 2022,,img,BCA,2500.0,103,1
+113,611,611,VIOLA,grade,Copy -A.Stradivarius; made in Czech.,0,img,201/G IV,90.0,97,1
+114,612,612,VIOLA,grade,May 28 -1881; Repair by B.F. Caron - Boston,0,img,205   GVII,700.0,56,1
+115,613,613,VIOLA,grade,Johann Georg Meisel (G I),0,img,0,600.0,116,1
+116,614,614,VIOLA,grade,No label; Old Italian instrument (G I),0,img,0,2000.0,91,1
+117,623,623,VIOLA,grade,Oskar Bernhard Heinel/Geigenbaumeister/ Markneukirchen/Faciebat Anno 1929,0,img,0,,120,1
+118,981,981,VIOLA,grade,Franz Gandner,Stradivarius Copy,img,0,2995.0,0,1
+119,982,982,VIOLA,grade,E.R. Pfetszchner,Stradivarius Copy,img,0,1200.0,117,1
+120,3656,3656,VIOLA,grade,William Huggler,0,img,0,5000.0,0,1
+121,3793,3793,VIOLA,grade,E. R. Pfretzschner,L100,img,0,300.0,109,1
+122,616,616,CELLO,grade,unknown,BEGINNER ONLY,img,802,100.0,153,1
+123,617,617,CELLO,grade,Kay  Old German,(better),img,0,5000.0,142,1
+124,790,790,CELLO,grade,Knilling,157F,img,13849,2497.0,181,1
+125,979,979,CELLO,grade,Klaus Geisler,165F  Geigenbaumeister,img,74026,5020.0,180,1
+126,980,980,CELLO,grade,Klaus Geisler,164F  Cellobaumeister,img,70368,4520.0,182,1
+127,3666,3666,CELLO,grade,Jean Baptiste Marinelli,handmade reproductioon GERMANY,img,12,800.0,144,1
+128,3705,3705,CELLO,grade,Johannes Kohr,K500cx,img,0,1600.0,140,1
+129,3775,3775,CELLO,grade,Rosalia,C-9,img,2012,2450.0,145,1
+130,3776,3776,CELLO,grade,Rosalia,C-9,img,2017,2450.0,146,1
+131,620,620,Bass-String (with electric pickup and case from G9),grade,Kay 3/4 size; M-1 model; 49564,49564,img,0,600.0,155,1
+132,621,621,BASS-String,grade,Kay full size; M-1; 49566  5-string,49566,img,0,960.0,152,1
+133,2203,2203,BASS-String,grade,Juzek,0,img,0,4000.0,158,1
+134,2505,2505,BASS-String,grade,ALBINO,Antonius Stradinarius,img,0,,150,1
+135,2682,2682,BASS-String,grade,Samuel Shen,SB 300,img,99-10-8,5720.0,156,1
+136,2683,2683,BASS-String,grade,Samuel Shen,SB 800,img,99-10-9,6220.0,157,1
+137,3025,3025,BASS-String,grade,Hans Kroger,870WGH,img,7562,1740.0,151,1
+138,3740,3740,BASS-String,grade,Eberhard Meinal,0,img,0,5950.0,154,1
+139,886,886,BANJO,grade,Antares,ABJ-243,img,0,400.0,230,1
+140,887,887,BANJO,grade,Antares,ABJ-243,img,0,400.0,161,1
+141,2033,2033,BANJO,grade,Antares,ABJ-243,img,0,489.0,221,1
+142,2929,2929,BANJO,grade,Gold Tone,BG250,img,220945,665.0,222,1
+143,3091,3091,BANJO,grade,Gold Tone,BG250F,img,0,695.0,226,1
+144,3384,3384,BANJO,grade,Gold Tone,BG250F,img,0,769.0,149,1
+145,3385,3385,BANJO,grade,Gold Tone,BG250F,img,0,769.0,190,1
+146,3386,3386,BANJO,grade,Gold Tone,BG250F,img,0,769.0,149,1
+147,3703,3703,BANJO,grade,White Ladye,GT-WL250,img,21507140,,133,1
+148,3704,3704,BANJO,grade,White Ladye,GT-WL250,img,21507142,,133,1
+149,3777,3777,BANJO,grade,Deering,Artison,img,0,725.0,224,1
+150,3778,3778,BANJO,grade,Deering,Artison,img,0,725.0,139,1
+151,1,1,Banjo new,grade,Gold Tone,,img,,,133,1
+152,2,2,banjo new,grade,Gold Tone,,img,,,133,1
+153,517,517,GUITAR,grade,La Patrie,Etude Classical,img,4523169,330.0,219,1
+154,624,624,GUITAR,grade,Yamaha,G-100A,img,Yamaha 1,300.0,0,1
+155,625,625,GUITAR,grade,Dauphin,D-14,img,Dauphin 1,199.0,225,1
+156,626,626,GUITAR,grade,Dauphin,D-14,img,Dauphin 2,199.0,218,1
+157,627,627,GUITAR,grade,Dauphin,D-14,img,Dauphin 3,199.0,149,1
+158,628,628,GUITAR,grade,G.J. Gould and Son; Made in Japan,GM20  Matsuoka ,img,Gould 1,300.0,90,1
+159,629,629,GUITAR,grade,G.J. Gould and Son; Made in Japan,GM20  Matsuoka ,img,Gould 2,300.0,149,1
+160,630,630,GUITAR,grade,G.J. Gould and Son; Made in Japan,GM20  Matsuoka ,img,Gould 3,300.0,223,1
+161,779,779,GUITAR - Left Handed,grade,Yamaha,CG-150SA,img,Yamaha LH1  21015356,320.0,216,1
+162,788,788,GUITAR,grade,La Patrie,Etude Classical,img,4022086,350.0,0,1
+163,882,882,GUITAR-STEEL STRING,grade,Sigma,DT-4M,img,93020310,364.0,90,1
+164,985,985,GUITAR-STEEL STRING,grade,Cort,EARTH1000 N,img,N 039385,503.0,163,1
+165,3001,3001,GUITAR,grade,La Patrie,Etude Classical ALA80D,img,2303894,350.0,227,1
+166,3002,3002,GUITAR,grade,La Patrie,Etude Classical ALA80D,img,3193400,350.0,217,1
+167,3003,3003,GUITAR,grade,Takamine,G-1245,img,QKH287359,420.0,237,1
+168,3004,3004,GUITAR,grade,Takamine,G-1245,img,QKI047290,420.0,90,1
+169,3005,3005,GUITAR,grade,Takamine,G-1245,img,QKI057107,420.0,163,1
+170,3011,3011,GUITAR-Bass,grade,Johnson,JP800P Sunburst Bass,img,0,,0,1
+171,3030,3030,GUITAR,grade,Takamine,G-1245,img,QKJ117068,420.0,134,1
+172,3031,3031,GUITAR,grade,Takamine,G-1245,img,QKJ127003,420.0,231,1
+173,3103,3103,GUITAR-BASS,grade,Pedulla,8512 USA,img,0,2926.0,0,1
+174,3533,3533,GUITAR,grade,La Patrie,Concert Classical,img,0,478.0,134,1
+175,3534,3534,GUITAR,grade,La Patrie,Concert Classical,img,0,478.0,90,1
+176,3535,3535,GUITAR-Resophonic (DOBRO),grade,REGAL,RD40MS,img,0,547.0,134,1
+177,3587,3587,GUITAR,grade,La Patrie,Concert Classical,img,425001985,489.0,220,1
+178,3588,3588,GUITAR - classical - Snapped String,grade,La Patrie,Etude Classical,img,340005389,435.0,90,1
+179,3589,3589,GUITAR-Electric-hollow top,grade,Epiphone,Joe Pass,img,SI07041304,495.0,239,1
+180,3590,3590,GUITAR-Electric-Bass and AMP,grade,Fender,Deluxe Active,img,MZ8074995,525.0,192,1
+181,3600,3600,GUITAR-3/4 size,grade,Cordoba,C3M Cadete,img,3/4 guitar,,133,1
+182,3626,3626,GUITAR,grade,Cordoba,C3M,img,0,,134,1
+183,3664,3664,GUITAR-3/4 size,grade,Cordoba,C3M Cadete,img,3/4 guitar,293.0,229,1
+184,3670,3670,GUITAR-3/4 size,grade,Cordoba,C3M Cadete,img,11317473,309.0,228,1
+185,3671,3671,GUITAR-3/4 size,grade,Cordoba,C3M Cadete,img,11317474,309.0,224,1
+186,3672,3672,AMP/SPEAKER,grade,Ampeg,BA-110,img,AUFP0043,179.0,149,1
+187,3674,3674,GUITAR,grade,Takamine,GC-1,img,TC13100141,,90,1
+188,3682,3682,"GUITAR-Electric-Bass, cord and amp",grade,Squier,Classic Vibe,img,CGS080602938,299.0,148,1
+189,3683,3683,"Bass Guitar3682 , AMP/SPEAKER",grade,Ampeg,BA-110,img,AUFB0186,179.0,149,1
+190,3685,3685,GUITAR,grade,Fender,CN90,img,OI14100706,,90,1
+191,3686,3686,GUITAR,grade,Fender,CN90,img,OI14100686,,90,1
+192,3687,3687,GUITAR,grade,Fender,CD60,img,IPS1410277,,133,1
+193,3688,3688,GUITAR,grade,Fender,CD60,img,IPS1410281,,133,1
+194,3724,3724,GUITAR,grade,Ventura,VWDONAT-left,img,0,205.0,90,1
+195,3741,3741,GUITAR-3/4 size,grade,Cordoba,C5 Cadete,img,916207,329.0,0,1
+196,3742,3742,GUITAR-3/4 size,grade,Cordoba,C5 Cadete,img,916211,329.0,90,1
+197,3743,3743,GUITAR-4/4 size,grade,Cordoba,F7 PACO,img,11604872,539.0,139,1
+198,3744,3744,GUITAR-4/4 size,grade,Cordoba,F7 PACO,img,11604875,539.0,162,1
+199,3745,3745,GUITAR-4/4 size,grade,Cordoba,F7 PACO,img,71607016,539.0,134,1
+200,3746,3746,GUITAR-4/4 size,grade,Cordoba,F7 PACO,img,71607017,539.0,139,1
+201,3747,3747,GUITAR-4/4 size,grade,Cordoba,F7 PACO,img,71607018,539.0,162,1
+202,3748,3748,GUITAR-3/4 size,grade,Cordoba,C5 Cadete,img,11607034,329.0,160,1
+203,3749,3749,GUITAR-3/4 size,grade,Cordoba,C5 Cadete,img,11705572,329.0,139,1
+204,3750,3750,GUITAR-4/4 size,grade,Cordoba,F7 Paco Flamenco,img,71700651,539.0,235,1
+205,3751,3751,GUITAR-4/4 size,grade,Cordoba,F7 Paco Flamenco,img,71700658,539.0,139,1
+206,3752,3752,GUITAR-4/4 size,grade,Cordoba,F7 Paco Flamenco,img,0,539.0,139,1
+207,3753,3753,GUITAR-4/4 size,grade,Cordoba,F7 Paco Flamenco,img,0,539.0,160,1
+208,3754,3754,GUITAR-4/4 size,grade,Cordoba,F7 Paco Flamenco,img,0,539.0,162,1
+209,3798,3798,GUITAR - classical,grade,La Patrie,Etude,img,45402001516,459.0,90,1
+210,4000,4000,Electric Bass Guitar,grade,Fender Squire,,img,ICSJ21037803,,194,1
+211,5506,5506,Guitar - 3/4 size - Classical,grade,Yamaha,CGS103A,img,IIM089434,,134,1
+212,5507,5507,Guitar - 3/4 size - Classical,grade,Yamaha,CGS103A,img,IIM089436,,134,1
+213,5508,5508,Guitar - 3/4 size - Classical,grade,Yamaha,CGS103A,img,IIM089435,,90,1
+214,5509,5509,Guitar - 3/4 size - Classical,grade,Yamaha,CGS103A,img,IIM089432,,90,1
+215,5510,5510,Guitar - 3/4 size - Classical,grade,Greg Bennett,TMJ-11CE/TBK,img,S130817656,,134,1
+216,5511,5511,Guitar - Acoustic-Electric,grade,Fender,Rumble 100,img,AUFP0043,,147,1
+217,3755,3755,Guitar Small (Fill Manually),grade,Cordoba,,img,,,134,1
+218,3756,3756,Guitar Small (Fill Manually),grade,Cordoba,,img,,,134,1
+219,3757,3757,Guitar Small (Fill Manually),grade,Cordoba,,img,,,134,1
+220,10001,10001,GUitar steel string,grade,,,img,,,90,1
+221,5560,5560,guitar formerly called 5507,grade,,,img,,,134,1
+222,5561,5561,guitar found in locker with no number,grade,,,img,,,149,1
+223,LH01,LH01,Guitar - Left handed (Fill manually),grade,,,img,,,149,1

@@ -12,13 +12,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/templates/style/style.css">
   <title>Tchaikbachx | Inventory </title>
-  <script src="/templates/script/fetch.js"></script>
-  <script src="/templates/script/filter.js"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="script/app.js"></script>
+  <script src="/templates/script/app.js"></script>
   <script>
-    // the following are scripts that execute to determine roles/content displayed.
-    //  > ideally, this is moved out to a separate .js file in /script,
-    //    since this is clunky & can be slow to include within an .html.
-    //  > i will worry about that later when i care
     (function () {
       const checkExist = setInterval(function () {
         const staffContainer = document.getElementById('staffActions');
@@ -53,7 +50,7 @@
   </script>
 </head>
 
-<body data-logged-in="false">
+<body x-data="inventory" data-logged-in="false">
   <!-- navigation bar -->
   <nav id="mainNav" class="navbar">
     <a href="/" class="nav-link">Home</a>
@@ -71,8 +68,8 @@
       <div class="toolbar">
         <!-- normal searching -->
         <div class="search-container">
-          <input type="text" id="dashboardSearch" placeholder="Search by name, type, make, or model..."
-            onkeyup="applyFilters()">
+          <input type="text" id="dashboardSearch" x-model="searchQuery"
+            placeholder="Search by name, type, make, or model...">
           <!-- advanced searching -->
           <button type="button" class="filter-btn" onclick="openAdvancedModal()">
             Advanced
@@ -84,9 +81,30 @@
       <!-- instrument containers/cards -->
       <div class="dashboard-main-content">
         <div class="scroll-container">
-          <div id="instrument-grid" class="instrument-grid">
-            <p>Loading instruments from database...</p>
+          <div class="instrument-grid" x-data="inventory">
+            <input type="text" x-model="searchQuery" placeholder="Search instruments...">
+
+            <template x-for="item in filteredInstruments" :key="item.ID">
+              <div class="instrument-card" :class="{'delete-shake': isDeleteMode}">
+                <div class="card-header">
+                  <h3 x-text="item.Name_ID"></h3>
+                  <span class="status-badge" :class="item.Status === 'IN' ? 'status-in' : 'status-out'"
+                    x-text="item.Status"></span>
+                </div>
+                <div class="card-body">
+                  <p><strong>Type:</strong> <span x-text="item.Type"></span></p>
+                  <p><strong>Make:</strong> <span x-text="item.Make"></span></p>
+                </div>
+
+                <template x-if="isStaff && isDeleteMode">
+                  <button @click="deleteInstrument(item.ID)" class="btn-delete">Confirm Delete</button>
+                </template>
+              </div>
+            </template>
           </div>
+          <!-- <div id="instrument-grid" class="instrument-grid">
+            <p>Loading instruments from database...</p>
+          </div> -->
         </div>
 
         <!-- instrument info panel -->
@@ -214,23 +232,23 @@
       <div class="filter-form">
         <div class="filter-field">
           <label>Type</label>
-          <input type="text" id="adv_Type" placeholder="e.g. Cello" oninput="applyFilters()">
+          <input type="text" id="adv_Type" x-model="advType" placeholder="e.g. Cello">
         </div>
         <div class="filter-field">
           <label>Make</label>
-          <input type="text" id="adv_Make" placeholder="e.g. Yamaha" oninput="applyFilters()">
+          <input type="text" id="adv_Make" x-model="advMake" placeholder="e.g. Yamaha">
         </div>
         <div class="filter-field">
           <label>Grade</label>
-          <input type="text" id="adv_Grade" placeholder="A, B, C" oninput="applyFilters()">
+          <input type="text" id="adv_Grade" x-model="advGrade" placeholder="A, B, C">
         </div>
         <div class="filter-field">
           <label>Location</label>
-          <input type="text" id="adv_Loc" placeholder="Locker #" oninput="applyFilters()">
+          <input type="text" id="adv_Loc" x-model="advLocation" placeholder="Locker #">
         </div>
         <div class="filter-field full-width">
           <label>Serial Number</label>
-          <input type="text" id="adv_Serial" placeholder="Partial serial..." oninput="applyFilters()">
+          <input type="text" id="adv_Serial" x-model="advSerial" placeholder="Partial serial...">
         </div>
 
         <div class="price-slider-group">
@@ -238,8 +256,7 @@
             <label>Price Range</label>
             <span id="priceDisplay" class="price-display">Max Price: $9999</span>
           </div>
-          <input type="range" id="adv_PriceMax" class="slider" min="0" max="9999" value="9999"
-            oninput="updatePriceLabel(this.value)">
+          <input type="range" id="adv_PriceMax" class="slider" x-model="advPrice" min="0" max="9999" value="9999">
         </div>
 
         <button class="btn-secondary" onclick="resetAllFilters()">Reset</button>

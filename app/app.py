@@ -5,12 +5,21 @@ import datetime
 # import addBorrower
 # import addBroken
 # import addCheckout
-# import addDepartment
+import addDepartment
 # import addInstrument
 # import addKkey
-# import addLocker
+import addLocker
 # import addMissing
+import emptyTrash
+import deleteEntry
 
+from flask import Flask
+
+app = Flask(__name__)
+@app.route("/")
+def home():
+    return "Hello"
+    
 # connect to the database file
 db = sqlite3.connect("database.db")
 cur = db.cursor()
@@ -26,6 +35,7 @@ def initTables():
     cur.execute("CREATE TABLE IF NOT EXISTS missing(ID INT PRIMARY KEY, Date_Missing, Date_Found, Item_ID, Description)")
     cur.execute("CREATE TABLE IF NOT EXISTS broken(ID INT PRIMARY KEY, Date_Broken, Date_Fixed, Item_ID, Description)")
     cur.execute("CREATE TABLE IF NOT EXISTS department(ID INT PRIMARY KEY, Department_Name)")
+    cur.execute("CREATE TABLE IF NOT EXISTS trashcan(ID INT PRIMARY KEY, otherID, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12)")
 
 # cur.execute("DELETE FROM locker WHERE ID IS NULL")
 # print(cur.execute("SELECT * FROM locker WHERE ID IS NULL").fetchall())
@@ -35,6 +45,14 @@ def initTables():
 
 # initialize tables
 initTables()
+
+# this function is causing error and i cannot figure out why. things are falling apart and making me sad. this is a disaster
+# addLocker.addLocker(db, "lockertodelete", None, 0, True)
+
+# How to add stuff to trashcan: (these will be deleted from the database but kept on a new table called trashcan until emptyTrash(db) is called)
+# emptyTrash.emptyTrash(db)
+# deleteEntry.deleteEntry(db, "tablename", ID)
+
 
 # commit changes to db file
 db.commit()
