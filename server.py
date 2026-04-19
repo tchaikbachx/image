@@ -7,21 +7,38 @@ from manager import manager
 app = Flask(__name__)
 CORS(app)
 
+# Get the absolute path to the directory where server.py lives
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-db_path = os.path.join(os.path.dirname(__file__), 'mirror', 'database.db')
-db = manager(db_path)
+# Tell Flask explicitly where to find your files
+app = Flask(__name__, 
+            template_folder=os.path.join(BASE_DIR, 'templates'),
+            static_folder=os.path.join(BASE_DIR, 'templates'))
 
 @app.route('/')
 def index():
+    # Use BASE_DIR instead of 'db' to find the folder
     return send_from_directory(os.path.join(BASE_DIR, 'templates'), 'index.html')
 
 @app.route('/dashboard')
 def dash():
     return send_from_directory(os.path.join(BASE_DIR, 'templates'), 'dash.html')
 
-@app.route('/templates/<path:path>')
-def send_assets(path):
-    return send_from_directory('templates', path)
+
+db_path = os.path.join(os.path.dirname(__file__), 'mirror', 'database.db')
+db = manager(db_path)
+
+# @app.route('/')
+# def index():
+#     return send_from_directory(os.path.join(db, 'templates'), 'index.html')
+
+# @app.route('/dashboard')
+# def dash():
+#     return send_from_directory(os.path.join(db, 'templates'), 'dash.html')
+
+# @app.route('/templates/<path:path>')
+# def send_assets(path):
+#     return send_from_directory('templates', path)
 
 
 # ignore this, will abstract static routes out later maybe
