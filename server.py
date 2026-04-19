@@ -1,64 +1,23 @@
 import os
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-<<<<<<< HEAD
 from manager import manager
-=======
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, BASE_DIR)
-
-# import all the local dependencies
-from app.addBorrower import addBorrower as aBorr
-from app.addBroken import addBroken as aBrok
-from app.addCheckout import addCheckout as aChec
-from app.addDepartment import addDepartment as aDepa
-from app.addInstrument import addInstrument as aInst
-from app.addKkey import addKkey as aKkey
-from app.addLocker import addLocker as aLock
-from app.addMissing import addMissing as aMiss
-
-from app.updateBorrower import updateBorrower as uBorr
-from app.updateBroken import updateBroken as uBrok
-from app.updateCheckout import updateCheckout as uChec
-from app.updateDepartment import updateDepartment as uDepa
-from app.updateInstrument import updateInstrument as uInst
-from app.updateKkey import updateKkey as uKkey
-from app.updateLocker import updateLocker as uLock
-from app.updateMissing import updateMissing as uMiss
-
-from app.deleteEntry import deleteEntry
->>>>>>> refs/remotes/origin/main
 
 
 app = Flask(__name__)
 CORS(app)
 
 
-<<<<<<< HEAD
 db_path = os.path.join(os.path.dirname(__file__), 'mirror', 'database.db')
 db = manager(db_path)
-=======
-# get the correct paths for database connection
-def get_db_connection():
-    db_path = os.path.join(BASE_DIR, 'mirror', 'database.db')
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    return conn
->>>>>>> refs/remotes/origin/main
 
 @app.route('/')
 def index():
     return send_from_directory(os.path.join(BASE_DIR, 'templates'), 'index.html')
 
 @app.route('/dashboard')
-<<<<<<< HEAD
-def dashboard():
-    return send_from_directory('templates', 'dash.html')
-=======
 def dash():
     return send_from_directory(os.path.join(BASE_DIR, 'templates'), 'dash.html')
->>>>>>> refs/remotes/origin/main
 
 @app.route('/templates/<path:path>')
 def send_assets(path):
@@ -116,13 +75,5 @@ def delete_entry(table_name, entry_id):
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     print("Server opened successfully without error on port 5000")
     app.run(debug=True, port=5000)
-=======
-    port = int(os.environ.get("PORT", 5000))
-    print(f"opened at http://0.0.0.0:{port}")
-    app.run(host='0.0.0.0', port=port)
-
-application = app
->>>>>>> refs/remotes/origin/main
