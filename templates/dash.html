@@ -21,180 +21,175 @@
     </header>
 
     <div class="dashboard-box">
-      <nav class="toolbar-container">
-        <div class="search-wrapper">
-          <input type="text" placeholder="Search by name, type, make, or model..." x-model="searchQuery">
-
-          <select x-model="filters.type" class="filter-select">
-            <option value="">All Types</option>
-            <option value="Brass">Brass</option>
-            <option value="Woodwind">Woodwind</option>
-            <option value="Strings">Strings</option>
-            <option value="Percussion">Percussion</option>
-          </select>
-
-          <button class="btn-advanced" @click="showAdvancedModal = true">
-            ⚙ Advanced
-          </button>
-        </div>
-
-        <div class="staff-actions-wrapper" x-show="isStaff">
-          <button class="btn-add" @click="openAddModal()">Add Instrument</button>
-          <button class="btn-edit-mode" :class="{'active': isEditMode}" @click="toggleEditMode()">Edit Mode</button>
-          <button class="btn-delete-mode" :class="{'active': isDeleteMode}" @click="toggleDeleteMode()">Delete
-            Mode</button>
-        </div>
-      </nav>
-
       <div class="dashboard-main-content">
-        <div class="scroll-container">
-          <div class="instrument-grid">
-            <template x-for="entry in filteredInstruments" :key="entry.ID">
-              <div class="instrument-card" :class="{ 
+        <nav class="toolbar-container">
+          <div class="search-wrapper">
+            <input type="text" placeholder="Search by name, type, make, or model..." x-model="searchQuery">
+            <button class="btn-advanced" @click="showAdvancedModal = true">
+              Filter
+            </button>
+          </div>
+          <div class="staff-controls" x-show="isStaff">
+            <button class="btn-tool btn-add" @click="openAddModal()">Add</button>
+            <button class="btn-tool btn-edit" :class="{ 'active': isEditMode }" @click="toggleEditMode()">Edit</button>
+            <button class="btn-tool btn-delete" :class="{ 'active': isDeleteMode }"
+              @click="toggleDeleteMode()">Delete</button>
+          </div>
+        </nav>
+
+        <div class="main-inventory-layout">
+          <div class="scroll-container">
+            <div class="instrument-grid">
+              <template x-for="entry in filteredInstruments" :key="entry.ID">
+                <div class="instrument-card" :class="{ 
                   'mode-edit-active': isEditMode,
                   'mode-delete-active': isDeleteMode,
                   'selected-highlight': selectedInstrument?.ID === entry.ID && !isEditMode && !isDeleteMode
               }" @click="handleCardClick(entry)">
 
-                <div class="card-horizontal-section">
-                  <h3 x-text="entry.Name_ID"></h3>
-                  <span class="status-badge" :class="entry.Status === 'IN' ? 'status-in' : 'status-out'"
-                    x-text="entry.Status"></span>
-                </div>
+                  <div class="card-horizontal-section">
+                    <h3 x-text="entry.Name_ID"></h3>
+                    <span class="status-badge" :class="entry.Status === 'IN' ? 'status-in' : 'status-out'"
+                      x-text="entry.Status"></span>
+                  </div>
 
-                <div class="card-horizontal-data">
-                  <div class="detail-item-inline">
-                    <strong>Type:</strong>
-                    <span x-text="entry.Type"></span>
+                  <div class="card-horizontal-data">
+                    <div class="detail-item">
+                      <strong>Type:</strong>
+                      <span x-text="entry.Type"></span>
+                    </div>
+                    <div class="detail-item">
+                      <strong>Make:</strong>
+                      <span x-text="entry.Make"></span>
+                    </div>
+                    <div class="detail-item">
+                      <strong>Model:</strong>
+                      <span x-text="entry.Model"></span>
+                    </div>
                   </div>
-                  <div class="detail-item-inline">
-                    <strong>Make:</strong>
-                    <span x-text="entry.Make"></span>
-                  </div>
-                  <div class="detail-item-inline">
-                    <strong>Model:</strong>
-                    <span x-text="entry.Model"></span>
-                  </div>
-                </div>
 
-                <template x-if="isStaff && isDeleteMode">
-                  <button @click.stop="deleteInstrument(entry.ID)" class="btn-delete-small">🞪</button>
-                </template>
-              </div>
-            </template>
+                  <template x-if="isStaff && isDeleteMode">
+                    <button @click.stop="deleteInstrument(entry.ID)" class="btn-delete-small">🞪</button>
+                  </template>
+                </div>
+              </template>
+            </div>
           </div>
-        </div>
 
-        <div id="details-sidebar" class="details-panel" :class="{ 'active': selectedInstrument }">
-          <div id="sidebar-inner-container">
-            <div class="header-card">
-              <div class="instrument-visual-large">
-                <div id="detail-picture-container" style="display:none;"></div>
+          <aside id="details-sidebar" x-show="selectedInstrument" x-cloak :class="{ 'active': selectedInstrument }">
+            <div class="sidebar-header">
+              <div class="header-main">
+                <h2 x-text="selectedInstrument?.Name_ID"></h2>
+                <span class="status-badge-large" :class="selectedInstrument?.Status"
+                  x-text="selectedInstrument?.Status"></span>
               </div>
-              <div class="header-text-large">
-                <h2 x-text="selectedInstrument?.Name_ID || 'Select an Instrument'"></h2>
-                <span class="status-indicator-pill"
-                  :class="selectedInstrument?.Status === 'IN' ? 'status-in' : 'status-out'"
-                  x-text="selectedInstrument?.Status || '---'" x-show="selectedInstrument">
-                </span>
-                <button class="close-btn" @click="selectedInstrument = null">&times;</button>
-              </div>
+              <button class="close-btn" @click="selectedInstrument = null">&times;</button>
             </div>
 
             <div class="sidebar-tabs">
               <button class="tab-btn" :class="{ 'active': currentTab === 'details' }"
                 @click="currentTab = 'details'">Details</button>
-              <button class="tab-btn" :class="{ 'active': currentTab === 'manage' }"
-                @click="currentTab = 'manage'">Manage</button>
-              <button class="tab-btn" :class="{ 'active': currentTab === 'history' }"
-                @click="currentTab = 'history'; fetchHistory(selectedInstrument.Name_ID)"
-                x-show="isStaff">History</button>
+              <button class="tab-btn" x-show="isStaff" :class="{ 'active': currentTab === 'manage' }"
+                @click="currentTab = 'manage'">
+                Manage
+              </button>
+              <button class="tab-btn" x-show="isStaff" :class="{ 'active': currentTab === 'history' }"
+                @click="currentTab = 'history'; fetchHistory(selectedInstrument.Name_ID)">
+                History
+              </button>
             </div>
 
-            <div id="manage-content" class="tab-pane" x-show="currentTab === 'manage'">
-              <div class="info-box" style="padding: 24px;">
-                <template x-if="selectedInstrument?.Status === 'IN'">
-                  <div class="checkout-form">
-                    <h3>Instrument Checkout</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">This instrument will be due on: <strong
-                        x-text="threeMonthsFromToday"></strong></p>
-                    <input type="email" x-model="checkoutEmail" placeholder="student@grinnell.edu" class="edit-input"
-                      style="margin-top:10px;">
-                    <button class="btn-primary" style="margin-top: 15px; width: 100%;" @click="submitCheckout()">Confirm
-                      Checkout</button>
+            <div class="sidebar-body">
+              <div x-show="currentTab === 'details'" class="tab-content">
+                <div class="detail-group">
+                  <h4>General Info</h4>
+                  <div class="detail-row"><span>Current ID</span><strong x-text="selectedInstrument?.Name_ID"></strong>
+                  </div>
+                  <div class="detail-row"><span>Type</span><strong x-text="selectedInstrument?.Type"></strong></div>
+                  <div class="detail-row"><span>Grade</span><strong x-text="selectedInstrument?.Grade"></strong></div>
+                </div>
+
+                <div class="detail-group">
+                  <h4>Manufacturer Info</h4>
+                  <div class="detail-row"><span>Make</span><strong x-text="selectedInstrument?.Make"></strong></div>
+                  <div class="detail-row"><span>Model</span><strong x-text="selectedInstrument?.Model"></strong></div>
+                  <div class="detail-row"><span>Serial Number</span><strong
+                      x-text="selectedInstrument?.Serial_Number"></strong></div>
+                </div>
+
+                <template x-if="isStaff">
+                  <div class="detail-group admin-only">
+                    <h4>Inventory Management</h4>
+                    <div class="detail-row"><span>Old ID</span><strong
+                        x-text="selectedInstrument?.Old_ID || 'N/A'"></strong></div>
+                    <div class="detail-row">
+                      <span>Value</span>
+                      <strong
+                        x-text="selectedInstrument?.Price ? '$' + Number(selectedInstrument.Price).toLocaleString() : 'N/A'"></strong>
+                    </div>
+                    <div class="detail-row">
+                      <span>Storage Location</span>
+                      <strong
+                        x-text="selectedInstrument?.Stored_In ? 'Locker #' + selectedInstrument.Stored_In : 'Unassigned'"></strong>
+                    </div>
+                    <div class="detail-row">
+                      <span>Department ID</span>
+                      <strong x-text="selectedInstrument?.Dept"></strong>
+                    </div>
                   </div>
                 </template>
 
-                <template x-if="selectedInstrument?.Status === 'OUT'">
-                  <div class="checkin-section">
-                    <p>This item is currently checked out.</p>
-                    <button class="btn-secondary" style="width: 100%;" @click="returnInstrument()">Mark as
-                      Returned</button>
-                  </div>
-                </template>
               </div>
-            </div>
 
-            <div id="history-content" class="tab-pane" x-show="currentTab === 'history'">
-              <div style="padding: 24px;">
-                <h3>Borrower History</h3>
-                <div class="history-list" style="margin-top: 15px;">
+              <div id="manage-content" class="tab-pane" :class="{ 'active': currentTab === 'manage' }"
+                x-show="currentTab === 'manage'">
+                <div class="action-card">
+                  <template x-if="selectedInstrument?.Status === 'IN'">
+                    <div class="checkout-ui">
+                      <h3>Checkout Instrument</h3>
+                      <p class="date-hint">Due Date: <span x-text="threeMonthsFromToday"></span></p>
+                      <div class="field">
+                        <label>Borrower Email</label>
+                        <input type="email" x-model="checkoutEmail" placeholder="student@grinnell.edu">
+                      </div>
+                      <button class="btn-primary full-width" @click="submitCheckout()">Confirm</button>
+                    </div>
+                  </template>
+
+                  <template x-if="selectedInstrument?.Status === 'OUT'">
+                    <div class="checkin-ui">
+                      <p>This item is currently <strong>Checked Out</strong>.</p>
+                      <button class="btn-primary full-width" @click="returnInstrument(selectedInstrument.Name_ID)"
+                        style="background-color: var(--status-out);">
+                        Return Instrument
+                      </button>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <div id="history-content" class="tab-pane" :class="{ 'active': currentTab === 'history' }"
+                x-show="currentTab === 'history'">
+                <div class="history-list">
                   <template x-if="instrumentHistory.length === 0">
-                    <p style="color: var(--text-muted);">No recorded history.</p>
+                    <p class="empty-msg">No checkout history found.</p>
                   </template>
                   <template x-for="log in instrumentHistory">
-                    <div
-                      style="padding: 12px; border-bottom: 1px solid var(--border); background: #fdfdfd; border-radius: 4px; margin-bottom: 8px;">
-                      <div style="font-weight: 600;" x-text="log.Email"></div>
-                      <div style="font-size: 0.8rem; color: var(--text-muted);"
-                        x-text="'Checked out: ' + log.Checkout_Date"></div>
-                      <div style="font-size: 0.8rem; color: var(--text-muted);" x-text="'Due: ' + log.Due_Date"></div>
+                    <div class="history-item">
+                      <div class="log-email" x-text="log.Email"></div>
+                      <div class="log-dates">
+                        <span x-text="'Out: ' + log.Checkout_Date"></span>
+                        <span x-text="'Due: ' + log.Due_Date"></span>
+                      </div>
                     </div>
                   </template>
                 </div>
               </div>
             </div>
+          </aside>
 
-            <div id="details-content" class="tab-pane" :class="{ 'active': currentTab === 'details' }"
-              x-show="currentTab === 'details'">
-              <div class="details-grid">
-                <div class="detail-item">
-                  <strong>Type</strong>
-                  <span x-show="!isEditMode" x-text="selectedInstrument?.Type || '---'"></span>
-                  <input x-show="isEditMode" type="text" x-model="selectedInstrument.Type" class="edit-input">
-                </div>
-
-                <div class="detail-item">
-                  <strong>Make</strong>
-                  <span x-show="!isEditMode" x-text="selectedInstrument?.Make || '---'"></span>
-                  <input x-show="isEditMode" type="text" x-model="selectedInstrument.Make" class="edit-input">
-                </div>
-
-                <div class="detail-item">
-                  <strong>Model</strong>
-                  <span x-show="!isEditMode" x-text="selectedInstrument?.Model || '---'"></span>
-                  <input x-show="isEditMode" type="text" x-model="selectedInstrument.Model" class="edit-input">
-                </div>
-
-                <div class="detail-item">
-                  <strong>Serial #</strong>
-                  <span x-show="!isEditMode" x-text="selectedInstrument?.Serial_Number || '---'"></span>
-                  <input x-show="isEditMode" type="text" x-model="selectedInstrument.Serial_Number" class="edit-input">
-                </div>
-              </div>
-
-              <div x-show="isStaff" class="staff-only-section">
-                <div class="detail-item">
-                  <strong>Location</strong>
-                  <span x-show="!isEditMode" x-text="selectedInstrument?.Stored_In || '---'"></span>
-                  <input x-show="isEditMode" type="text" x-model="selectedInstrument.Stored_In" class="edit-input">
-                </div>
-
-                <button class="btn-primary" @click="updateInstrument()">Confirm</button>
-              </div>
-            </div>
-          </div>
         </div>
+
       </div>
     </div>
   </main>
@@ -241,7 +236,7 @@
 
       <div class="details-grid">
         <div class="detail-item">
-          <label>Name ID</label>
+          <label>Current ID</label>
           <input type="text" x-model="filters.Name_ID" placeholder="e.g. TR-01">
         </div>
         <div class="detail-item">
@@ -251,12 +246,13 @@
 
         <div class="detail-item">
           <label>Type</label>
-          <select x-model="filters.Type">
+          <input type="text" x-model="filters.Type">
+          <!-- <select x-model="filters.Type">
             <option value="">All Types</option>
             <option value="Brass">Brass</option>
             <option value="Strings">Strings</option>
             <option value="Woodwind">Woodwind</option>
-          </select>
+          </select> -->
         </div>
         <div class="detail-item">
           <label>Grade</label>

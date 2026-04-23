@@ -116,7 +116,7 @@ def checkout_api():
     borrower_match = next((b for b in borrower if b['Email'] == email), None)
     
     if not borrower_match:
-        borrower_id = db.add('borrower', {'Email': email, 'Name': email.split('@')[0]})
+        borrower_id = db.add('borrower', {'Email': email})
     else:
         borrower_id = borrower_match['ID']
 

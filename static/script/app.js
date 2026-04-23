@@ -93,11 +93,31 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        async returnInstrument(instrumentId) {
+            if (!confirm(`Are you sure you want to return ${instrumentId}?`)) return;
+
+            try {
+                const response = await fetch(`/api/return/${instrumentId}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    await this.fetchInstruments();
+                    this.selectedInstrument = null;
+                    alert("Instrument returned successfully.");
+                } else {
+                    const error = await response.json();
+                    alert("Error returning instrument: " + error.message);
+                }
+            } catch (err) {
+                console.error("Return failed:", err);
+            }
+        },
+
         get filteredInstruments() {
             const q = this.searchQuery.toLowerCase().trim();
             
             return this.instruments.filter(i => {
-                // normal searching
                 const matchesSearch = !q || (
                     i.Name_ID?.toString().toLowerCase().includes(q) ||
                     i.Type?.toLowerCase().includes(q) ||
@@ -105,22 +125,22 @@ document.addEventListener('alpine:init', () => {
                     i.Model?.toLowerCase().includes(q)
                 );
 
-                // advanced searching
-                const matchesName = !this.filters.Name_ID || i.Name_ID.includes(this.filters.Name_ID);
-                const matchesOldID = !this.filters.Old_ID || i.Old_ID.includes(this.filters.Old_ID);
-                const matchesType = !this.filters.Type || i.Type === this.filters.Type;
-                const matchesGrade = !this.filters.Grade || i.Grade === this.filters.Grade;
-                const matchesMake = !this.filters.Make || i.Make.toLowerCase().includes(this.filters.Make.toLowerCase());
-                const matchesModel = !this.filters.Model || i.Model.toLowerCase().includes(this.filters.Model.toLowerCase());
-                const matchesSerial = !this.filters.Serial_Number || i.Serial_Number.includes(this.filters.Serial_Number);
-                
-                const matchesPrice = i.Price <= parseFloat(this.filters.Price);
-                const matchesStore = !this.filters.Stored_In || i.Stored_In == this.filters.Stored_In;
-                const matchesDept = !this.filters.Dept || i.Dept == this.filters.Dept;
+                const matchesType = !this.filters.Type || 
+                    i.Type?.toLowerCase().includes(this.filters.Type.toLowerCase().trim());
 
-                return matchesSearch && matchesName && matchesOldID && matchesType && 
-                    matchesGrade && matchesMake && matchesModel && matchesSerial && 
-                    matchesPrice && matchesStore && matchesDept;
+                const matchesGrade = !this.filters.Grade || i.Grade === this.filters.Grade;
+                const matchesMake = !this.filters.Make || i.Make?.toLowerCase().includes(this.filters.Make.toLowerCase());
+                const matchesModel = !this.filters.Model || i.Model?.toLowerCase().includes(this.filters.Model.toLowerCase());
+                const matchesSerial = !this.filters.Serial_Number || i.Serial_Number?.toString().includes(this.filters.Serial_Number);
+                
+                const maxPrice = parseFloat(this.filters.Price) || 9999;
+                const matchesPrice = (parseFloat(i.Price) || 0) <= maxPrice;
+
+                const matchesStored = !this.filters.Stored_In || i.Stored_In?.toString() === this.filters.Stored_In.toString();
+                const matchesDept = !this.filters.Dept || i.Dept?.toString() === this.filters.Dept.toString();
+
+                return matchesSearch && matchesType && matchesGrade && matchesMake && 
+                    matchesModel && matchesSerial && matchesPrice && matchesStored && matchesDept;
             });
         },
 
