@@ -33,8 +33,8 @@ from app.deleteEntry import deleteEntry
 # separated the function out so that the server is divided from
 # the database to meet abstraction goal (and it is cleaner).
 class manager:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, db_path):
+        self.path = db_path
         self.add_map = {
             'borrower': aborr,
             'broken': abrok,
@@ -100,9 +100,24 @@ class manager:
             return self.add_map[table](conn, **data)
         
 
-    def update(self, table, id, data):
-        if table not in self.update_map:
-            raise ValueError(f"No update method defined for table: {table}")
+    def update(self, table, entry_id, data):
+        # data dictionary {'Type': 'Horn', 'Make': 'Yamaha'}
+        if not data:
+            return False
+
+        keys = [f"{k} = ?" for k in data.keys()]
+        query = f"UPDATE {table} SET {', '.join(keys)} WHERE ID = ?"
+        
+        # combine values [value1, value2, ..., entry_id]
+        params = list(data.values()) + [entry_id]
         
         with self.get() as conn:
-            return self.update_map[table](conn, id, **data)
+            cur = conn.cursor()
+            try:
+                cur.execute(query, params)
+                conn.commit()
+                return cur.rowcount > 0
+            except Exception as e:
+                # this is for debugging in browser console
+                print(f"SQL Error: {query} with params {params}")
+                raise e
