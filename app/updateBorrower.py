@@ -1,6 +1,6 @@
 import sqlite3
 
-from app import updateIfNotNull
+import updateIfNotNull
 
 # updateBorrower(ID: int, Email: str):
 # updates a borrower record with given fields in the database

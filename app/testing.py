@@ -1,3 +1,9 @@
+import sys
+
+# setting path
+sys.path.append('../image')
+
+# importing
 from manager import manager
 import sqlite3
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
@@ -6,7 +12,7 @@ import os
 
 # connect to the database file
 
-db_path = os.path.join(os.path.dirname(__file__), 'app', 'test.db')
+db_path = os.path.join(os.path.dirname(__file__), 'test.db')
 man = manager(db_path)
 
 db = sqlite3.connect(db_path)
@@ -33,78 +39,87 @@ def initTables():
 # delTables()
 # deletes every table in the db
 def delTables():
-    cur.execute("DELETE TABLE IF EXISTS instrument")
-    cur.execute("DELETE TABLE IF EXISTS kkey")
-    cur.execute("DELETE TABLE IF EXISTS locker")
-    cur.execute("DELETE TABLE IF EXISTS borrower")
-    cur.execute("DELETE TABLE IF EXISTS checkout")
-    cur.execute("DELETE TABLE IF EXISTS missing")
-    cur.execute("DELETE TABLE IF EXISTS broken")
-    cur.execute("DELETE TABLE IF EXISTS department")
-    cur.execute("DELETE TABLE IF EXISTS trashcan")
+    cur.execute("DROP TABLE IF EXISTS instrument")
+    cur.execute("DROP TABLE IF EXISTS kkey")
+    cur.execute("DROP TABLE IF EXISTS locker")
+    cur.execute("DROP TABLE IF EXISTS borrower")
+    cur.execute("DROP TABLE IF EXISTS checkout")
+    cur.execute("DROP TABLE IF EXISTS missing")
+    cur.execute("DROP TABLE IF EXISTS broken")
+    cur.execute("DROP TABLE IF EXISTS department")
+    cur.execute("DROP TABLE IF EXISTS trashcan")
 
 # init tables
 try:
     initTables()
     print("PASS test: initialized tables")
+    break
 except Exception as e:
-    print("FAIL test: failed to initialize tables (" + e + ")")
+    print("FAIL test: failed to initialize tables (" + str(e) + ")")
 
 # try to add a dummy instrument to the empty table
 try:
     man.add('instrument', jsonify(dummy))
     print("PASS test: added dummy instrument to empty table")
+    break
 except Exception as e:
-    print("FAIL test: failed to add dummy instrument to empty table (" + e + ")")
+    print("FAIL test: failed to add dummy instrument to empty table (" + str(e) + ")")
 
 # try to add a second dummy instrument to the now non-empty table
 try:
     man.add('instrument', jsonify(dummy))
     print("PASS test: added second dummy instrument to table")
+    break
 except Exception as e:
-    print("FAIL test: failed to add second dummy instrument to table (" + e + ")")
+    print("FAIL test: failed to add second dummy instrument to table (" + str(e) + ")")
 
 # try to edit an entry
 try:
     man.update('instrument', "1", jsonify(dummy2))
     print("PASS test: edited entry 1")
+    break
 except Exception as e:
-    print("FAIL test: failed to edit entry 1 (" + e + ")")
+    print("FAIL test: failed to edit entry 1 (" + str(e) + ")")
 
 # try to delete entry with ID = 0
 try:
     man.delete('instrument', "0")
     print("PASS test: deleted entry 0")
+    break
 except Exception as e:
-    print("FAIL test: failed to delete entry 0 (" + e + ")")
+    print("FAIL test: failed to delete entry 0 (" + str(e) + ")")
 
 # try to add a dummy instrument back into table at ID = 0
 try:
     man.add('instrument', jsonify(dummy))
     print("PASS test: added dummy instrument to table at ID = 0 after deletion")
+    break
 except Exception as e:
-    print("FAIL test: failed to add dummy instrument to table at ID = 0 after deletion (" + e + ")")
+    print("FAIL test: failed to add dummy instrument to table at ID = 0 after deletion (" + str(e) + ")")
 
 # try to edit entry that doesn't exist
 try:
     man.update('missing', "3", jsonify(dummy))
     print("FAIL test: did not throw exception trying to edit null entry")
+    break
 except Exception as e:
-    print("PASS test: threw exception trying to edit null entry (" + e + ")")
+    print("PASS test: threw exception trying to edit null entry (" + str(e) + ")")
 
 # try to delete entry that doesn't exist
 try:
     man.delete('missing', "3")
     print("FAIL test: did not throw exception trying to delete null entry")
+    break
 except Exception as e:
-    print("PASS test: threw exception trying to delete null entry (" + e + ")")
+    print("PASS test: threw exception trying to delete null entry (" + str(e) + ")")
 
 # try to make an entry with bad data
 try:
     man.add('instrument', jsonify(securitydummy))
     print("FAIL test: successfully added entry with bad data")
+    break
 except Exception as e:
-    print("PASS test: failed to add entry with bad data (" + e + ")")
+    print("PASS test: failed to add entry with bad data (" + str(e) + ")")
 
 # delete test tables after testing finishes
 delTables()
