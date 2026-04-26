@@ -176,5 +176,8 @@ def delete_instrument(entry_id):
 # for debugging purposes when running on local ports; it should not be
 # included in the live version
 if __name__ == '__main__':
-    print("Server opened successfully without error on local port 5000")
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"opened at http://0.0.0.0:{port}")
+    app.run(host='0.0.0.0', port=port)
+
+application = app
