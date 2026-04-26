@@ -7,4 +7,4 @@ if project_home not in sys.path:
 
  # os.environ['PROJECT_ROOT'] = project_home
 
-from app import app as application
+from server import app as application
