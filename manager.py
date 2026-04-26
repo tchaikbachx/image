@@ -6,27 +6,27 @@ import sqlite3
 sys.path.append(os.path.join(os.path.dirname(__file__), 'app'))
 
 # ADD
-from app.addBorrower import addBorrower as aborr
-from app.addBroken import addBroken as abrok
-from app.addCheckout import addCheckout as achek
-from app.addDepartment import addDepartment as adepa
-from app.addInstrument import addInstrument as ainst
-from app.addKkey import addKkey as akkey
-from app.addLocker import addLocker as alock
-from app.addMissing import addMissing as amiss
+from addBorrower import addBorrower as aborr
+from addBroken import addBroken as abrok
+from addCheckout import addCheckout as achek
+from addDepartment import addDepartment as adepa
+from addInstrument import addInstrument as ainst
+from addKkey import addKkey as akkey
+from addLocker import addLocker as alock
+from addMissing import addMissing as amiss
 
 # UPDATE
-from app.updateBorrower import updateBorrower as uborr
-from app.updateBroken import updateBroken as ubrok
-from app.updateCheckout import updateCheckout as uchek
-from app.updateDepartment import updateDepartment as udepa
-from app.updateInstrument import updateInstrument as uinst
-from app.updateKkey import updateKkey as ukkey
-from app.updateLocker import updateLocker as ulock
-from app.updateMissing import updateMissing as umiss
+from updateBorrower import updateBorrower as uborr
+from updateBroken import updateBroken as ubrok
+from updateCheckout import updateCheckout as uchek
+from updateDepartment import updateDepartment as udepa
+from updateInstrument import updateInstrument as uinst
+from updateKkey import updateKkey as ukkey
+from updateLocker import updateLocker as ulock
+from updateMissing import updateMissing as umiss
 
 # DELETE
-from app.deleteEntry import deleteEntry
+from deleteEntry import deleteEntry
 
 # -----------------------------------------------------------
 
