@@ -53,7 +53,6 @@ def delTables():
 try:
     initTables()
     print("PASS test: initialized tables")
-    break
 except Exception as e:
     print("FAIL test: failed to initialize tables (" + str(e) + ")")
 
@@ -61,7 +60,6 @@ except Exception as e:
 try:
     man.add('instrument', jsonify(dummy))
     print("PASS test: added dummy instrument to empty table")
-    break
 except Exception as e:
     print("FAIL test: failed to add dummy instrument to empty table (" + str(e) + ")")
 
@@ -69,7 +67,6 @@ except Exception as e:
 try:
     man.add('instrument', jsonify(dummy))
     print("PASS test: added second dummy instrument to table")
-    break
 except Exception as e:
     print("FAIL test: failed to add second dummy instrument to table (" + str(e) + ")")
 
@@ -77,7 +74,6 @@ except Exception as e:
 try:
     man.update('instrument', "1", jsonify(dummy2))
     print("PASS test: edited entry 1")
-    break
 except Exception as e:
     print("FAIL test: failed to edit entry 1 (" + str(e) + ")")
 
@@ -85,7 +81,6 @@ except Exception as e:
 try:
     man.delete('instrument', "0")
     print("PASS test: deleted entry 0")
-    break
 except Exception as e:
     print("FAIL test: failed to delete entry 0 (" + str(e) + ")")
 
@@ -93,7 +88,6 @@ except Exception as e:
 try:
     man.add('instrument', jsonify(dummy))
     print("PASS test: added dummy instrument to table at ID = 0 after deletion")
-    break
 except Exception as e:
     print("FAIL test: failed to add dummy instrument to table at ID = 0 after deletion (" + str(e) + ")")
 
@@ -101,7 +95,6 @@ except Exception as e:
 try:
     man.update('missing', "3", jsonify(dummy))
     print("FAIL test: did not throw exception trying to edit null entry")
-    break
 except Exception as e:
     print("PASS test: threw exception trying to edit null entry (" + str(e) + ")")
 
@@ -109,7 +102,6 @@ except Exception as e:
 try:
     man.delete('missing', "3")
     print("FAIL test: did not throw exception trying to delete null entry")
-    break
 except Exception as e:
     print("PASS test: threw exception trying to delete null entry (" + str(e) + ")")
 
@@ -117,7 +109,6 @@ except Exception as e:
 try:
     man.add('instrument', jsonify(securitydummy))
     print("FAIL test: successfully added entry with bad data")
-    break
 except Exception as e:
     print("PASS test: failed to add entry with bad data (" + str(e) + ")")
 
