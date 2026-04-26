@@ -9,9 +9,10 @@ from manager import manager
 # --------------------------- DO NOT CHANGE THIS ----------------------------+
 
 # get the abs path to the directory (kept same naming conventions as in .wsgi)
-BASE_DIR = os.environ.get('PROJECT_ROOT', os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.environ.get('PROJECT_ROOT', os.path.dirname(os.path.abspath(__file__)))
 
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, BASE_DIR)
 # set up the server variable and load it with the correct file paths.
 # >> path should always be /templates/ for the raw html and anything else
 #    is in /templates/<folder> (for scripts and styling)
