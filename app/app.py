@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+from datetime import date
 
 # import exportAsCSV #THIS ONE NEEDS TO BE FIXED
 import addBorrower
@@ -47,7 +48,7 @@ def initTables():
 # initialize tables
 initTables()
 
-# updateCheckout.updateCheckout(db, 6, None, None, None, None, "4/27/26")
+updateCheckout.updateCheckout(db, 3, None, None, None, None, date.today())
 
 
 # addCheckout.addCheckout(db, 300, 3, "4/5/27")
