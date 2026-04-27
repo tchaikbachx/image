@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date
 
 def addCheckout(conn, Item_ID, Borrower_ID, Due_Date):
     cur = conn.cursor()
@@ -13,9 +14,10 @@ def addCheckout(conn, Item_ID, Borrower_ID, Due_Date):
         newID = result[0] + 1
 
     # 2. Insert the new checkout record
-    # Assuming your columns are (ID, Item_ID, Borrower_ID, Return_Date)
-    query = "INSERT INTO checkout (ID, Item_ID, Borrower_ID, Due_Date) VALUES (?, ?, ?, ?)"
-    cur.execute(query, (newID, Item_ID, Borrower_ID, Due_Date))
+    # the columns are (ID, Item_ID, Borrower_ID, Return_Date)
+
+    query = "INSERT INTO checkout (ID,  Borrower_ID, Item_ID, Checkout_Date, Due_Date) VALUES (?, ?, ?, ?, ?)"
+    cur.execute(query, (newID, Borrower_ID, Item_ID, date.today(), Due_Date))
 
     conn.commit()
     return newID

@@ -1,17 +1,18 @@
 import sqlite3
 import datetime
 
-# import exportAsCSV
-# import addBorrower
-# import addBroken
-# import addCheckout
+# import exportAsCSV #THIS ONE NEEDS TO BE FIXED
+import addBorrower
+import addBroken
+import addCheckout
 import addDepartment
-# import addInstrument
-# import addKkey
+import addInstrument
+import addKkey
 import addLocker
-# import addMissing
+import addMissing
 import emptyTrash
 import deleteEntry
+import updateCheckout #THIS NEEDS TO BE FIXED STILL... THE EXTRA COMMAS ARE CAUSING ERROR. WILL NEED TO BE CHANGED
 
 from flask import Flask
 
@@ -46,8 +47,12 @@ def initTables():
 # initialize tables
 initTables()
 
-# this function is causing error and i cannot figure out why. things are falling apart and making me sad. this is a disaster
-# addLocker.addLocker(db, "lockertodelete", None, 0, True)
+# updateCheckout.updateCheckout(db, 6, None, None, None, None, "4/27/26")
+
+
+# addCheckout.addCheckout(db, 300, 3, "4/5/27")
+# addCheckout.addCheckout(db, 200, 2, "3/4/22")
+# addCheckout.addCheckout(db, 100, 4, "9/4/22")
 
 # How to add stuff to trashcan: (these will be deleted from the database but kept on a new table called trashcan until emptyTrash(db) is called)
 # emptyTrash.emptyTrash(db)

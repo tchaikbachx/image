@@ -8,7 +8,7 @@ def updateCheckout(conn: Connection, ID: int, Borrower_ID: int, Item_ID: int, Ch
     # set cursor for db interaction
     cur = conn.cursor()
 
-    cur.execute("UPDATE checkout SET " + updateIfNotNull.uINN("Borrower_ID", Borrower_ID) + ", " + updateIfNotNull.uINN("Item_ID", Item_ID) + ", " + updateIfNotNull.uINN("Checkout_Date", Checkout_Date) + ", " + updateIfNotNull.uINN("Due_Date", Dute_Date) + ", " + updateIfNotNull.uINN("Closed_Date", Closed_Date) + " WHERE ID = " + str(ID))
+    cur.execute("UPDATE checkout SET " + updateIfNotNull.uINN("Borrower_ID", Borrower_ID) + ", " + updateIfNotNull.uINN("Item_ID", Item_ID) + ", " + updateIfNotNull.uINN("Checkout_Date", Checkout_Date) + ", " + updateIfNotNull.uINN("Due_Date", Due_Date) + ", " + updateIfNotNull.uINN("Closed_Date", Closed_Date) + " WHERE ID = " + str(ID))
 
     # commit changes to db file
     conn.commit()
