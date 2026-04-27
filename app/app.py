@@ -1,15 +1,19 @@
 import sqlite3
 import datetime
+from datetime import date
 
-# import exportAsCSV
-# import addBorrower
-# import addBroken
-# import addCheckout
-# import addDepartment
-# import addInstrument
-# import addKkey
-# import addLocker
-# import addMissing
+# import exportAsCSV #THIS ONE NEEDS TO BE FIXED
+import addBorrower
+import addBroken
+import addCheckout
+import addDepartment
+import addInstrument
+import addKkey
+import addLocker
+import addMissing
+import emptyTrash
+import deleteEntry
+import updateCheckout #THIS NEEDS TO BE FIXED STILL... THE EXTRA COMMAS ARE CAUSING ERROR. WILL NEED TO BE CHANGED
 
 from flask import Flask
 
@@ -33,12 +37,28 @@ def initTables():
     cur.execute("CREATE TABLE IF NOT EXISTS missing(ID INT PRIMARY KEY, Date_Missing, Date_Found, Item_ID, Description)")
     cur.execute("CREATE TABLE IF NOT EXISTS broken(ID INT PRIMARY KEY, Date_Broken, Date_Fixed, Item_ID, Description)")
     cur.execute("CREATE TABLE IF NOT EXISTS department(ID INT PRIMARY KEY, Department_Name)")
+    cur.execute("CREATE TABLE IF NOT EXISTS trashcan(ID INT PRIMARY KEY, otherID, col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12)")
+
+# cur.execute("DELETE FROM locker WHERE ID IS NULL")
+# print(cur.execute("SELECT * FROM locker WHERE ID IS NULL").fetchall())
 
 
 #----- FUNCTIONS ABOVE ----- CALLS BELOW -----#
 
 # initialize tables
 initTables()
+
+updateCheckout.updateCheckout(db, 3, None, None, None, None, date.today())
+
+
+# addCheckout.addCheckout(db, 300, 3, "4/5/27")
+# addCheckout.addCheckout(db, 200, 2, "3/4/22")
+# addCheckout.addCheckout(db, 100, 4, "9/4/22")
+
+# How to add stuff to trashcan: (these will be deleted from the database but kept on a new table called trashcan until emptyTrash(db) is called)
+# emptyTrash.emptyTrash(db)
+# deleteEntry.deleteEntry(db, "tablename", ID)
+
 
 # commit changes to db file
 db.commit()

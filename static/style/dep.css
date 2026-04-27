@@ -41,6 +41,10 @@
    |                                                               GENERAL/ALL  |
    +----------------------------------------------------------------------------+ */
 
+[x-cloak] { 
+    display: none !important; 
+}
+
 html, body {
     height: 100%;
     margin: 0;
@@ -128,6 +132,44 @@ body {
     margin: 0;
     font-size: 0.9rem;
     color: #666;
+}
+
+/* Force the card to be a single horizontal row */
+.card-horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center; /* Vertically centers all items in the row */
+    gap: 20px;           /* Consistent spacing between all elements */
+    padding: 10px 20px;
+    width: 100%;
+}
+
+/* Remove default margins from headers to prevent vertical pushing */
+.card-horizontal h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    min-width: 120px;    /* Keeps names aligned */
+}
+
+/* Grouping for Make/Model labels and values */
+.card-data-group {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.card-data-group strong {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+/* Ensure the status badge doesn't shrink */
+.card-horizontal .status-badge {
+    flex-shrink: 0;
+    margin: 0;
 }
 
 main {
@@ -322,7 +364,7 @@ body[data-logged-in="true"] .update-group {
    |                                                                 DASHBOARD  |
    +----------------------------------------------------------------------------+ */
 
-.scroll-container {
+/* .scroll-container {
     flex: 1;
     height: 60vh;
     background: white;
@@ -330,6 +372,11 @@ body[data-logged-in="true"] .update-group {
     overflow-y: auto;
     padding-right: 15px; 
     box-sizing: border-box;
+} */
+
+.scroll-container {
+    flex: 1; /* The list takes up all remaining space */
+    overflow-y: auto;
 }
 
 .dashboard-container {
@@ -350,52 +397,31 @@ body[data-logged-in="true"] .update-group {
 }
 
 .dashboard-main-content {
-    display: flex;
+    display: flex !important;
+    flex-direction: row !important;
     width: 100%;
-    height: 100%;
-    align-items: stretch;
-    overflow: hidden;
-    gap: 0;
+    height: calc(100vh - 120px);
+    overflow: hidden; /* Keep the main view contained */
 }
 
-#sidebar-inner-container {
-    height: 60vh;
-    padding: 30px 35px;
+.scroll-container {
+    flex: 1; 
+    min-width: 0; /* CRITICAL: Allows the list to narrow down */
+    overflow-y: auto;
+    z-index: 1;
 }
 
 .details-panel {
-    width: 0;
-    opacity: 0;
-    background: rgb(235, 241, 249);
-    border: 1px solid var(--bt);
-    border-radius: 8px;
-    transition: width 0.3s ease, opacity 0.3s ease;
-    overflow: hidden;
-    position: relative;
-    box-sizing: border-box;
-}
-
-.details-panel.active {
     width: 400px;
-    margin-left: 10px;
-    opacity: 1;
+    flex-shrink: 0; /* Prevents the sidebar from being squished */
+    z-index: 10;
+    background: white;
+    position: relative; /* Keep it in the flex flow */
 }
 
-.details-panel .close-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--ol);
-    cursor: pointer;
-    line-height: 1;
-    padding: 4px;
-    transition: color 0.2s ease;
-    z-index: 10;
-    white-space: nowrap; 
-    transition: opacity 0.2s ease;
+/* When Alpine adds the 'active' class, show it */
+.details-panel.active {
+    display: flex !important;
 }
 
 .header-card {
@@ -430,7 +456,58 @@ body[data-logged-in="true"] .update-group {
     color: var(--ol);
 }
 
+/* Existing styles you provided */
 .instrument-card.compact-row {
+    display: flex !important;
+    flex-direction: row;      /* Keep card contents horizontal */
+    width: 100%;              /* Take up full width of the column */
+    box-sizing: border-box;   /* Prevents padding from breaking width */
+}
+
+.instrument-card.selected-highlight {
+    background-color: #f0f7ff !important;
+    border-left: 5px solid var(--ol) !important;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+.card-horizontal-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* Fixed width prevents the browser from recalculating every row */
+    width: 280px; 
+    flex-shrink: 0;
+}
+
+.card-horizontal-data {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    flex-grow: 1;
+    /* This allows the data section to scroll if the screen is small 
+       instead of forcing a massive recalculation */
+    overflow: hidden; 
+}
+
+.detail-item-inline {
+    /* Give these a min-width so they align like columns in a table */
+    min-width: 120px;
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.detail-item-inline strong {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.detail-item-inline span {
+    font-weight: 500;
+}
+
+/* .instrument-card.compact-row {
     padding: 18px 25px;
     min-height: 80px;
     background: #fff;
@@ -467,7 +544,7 @@ body[data-logged-in="true"] .update-group {
     transition: opacity 0.3s ease, border-color 0.3s ease;
     pointer-events: none;
     z-index: -1;
-}
+} */
 
 .selected-card {
     background-color: #f0f7ff !important; 
@@ -654,6 +731,11 @@ body[data-logged-in="true"] .update-group {
 }
 
 #details-sidebar {
+    flex-shrink: 0; /* Prevents the sidebar from being squished to 0px */
+    z-index: 100;
+}
+
+/* #details-sidebar {
     position: relative;
     height: 100%;
     width: 0;
@@ -667,9 +749,20 @@ body[data-logged-in="true"] .update-group {
     flex-shrink: 0;
     will-change: width, opacity;
     transform: translateZ(0);
+    
+    z-index: 100;         /* Ensure it stays on top of the list */
+    /* display: flex;        
+    flex-direction: column;
+} */
+
+#details-sidebar.active {
+    width: 400px !important;
+    min-width: 400px;     /* Prevents it from collapsing to 0 width */
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
-#details-sidebar.open {
+/* #details-sidebar.open {
     width: 400px;
     opacity: 1;
     margin-left: 20px;
@@ -677,7 +770,7 @@ body[data-logged-in="true"] .update-group {
     border-radius: 12px; 
     background: white ;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
+} */
 
 .sidebar-inner-content {
     width: 400px;
@@ -725,10 +818,10 @@ body[data-logged-in="true"] .update-group {
 }
 
 .instrument-grid {
-    flex-grow: 1;
-    overflow-y: auto;
-    height: 100%;
-    padding-right: 10px;
+    display: flex !important; /* Force Flex instead of Grid to stop the N by N issue */
+    flex-direction: column;   /* Stack cards vertically */
+    width: 100%;
+    gap: 12px;
 }
 
 .edit-mode .instrument-card::before {
@@ -850,7 +943,7 @@ input[type=range] {
 }
 
 .tab-pane.active {
-    display: block;
+    display: block !important;
 }
 
 #checkout-email, #checkout-due {
@@ -860,4 +953,9 @@ input[type=range] {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+.instrument-card {
+    will-change: transform, opacity;
+    transform: translateZ(0); /* Triggers GPU acceleration */
 }

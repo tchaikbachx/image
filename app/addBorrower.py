@@ -1,27 +1,25 @@
-import sys
 import sqlite3
 
+def addBorrower(conn, Email: str):
+    # set cursor for db interaction
+    cur = conn.cursor()
 
-# connect to the database file
-db = sqlite3.connect("database.db")
-cur = db.cursor()
+    # 1. Fetch latest ID to populate the new ID field
+    cur.execute("SELECT ID FROM borrower ORDER BY ID DESC LIMIT 1")
+    result = cur.fetchone()
+    
+    # Handle empty table case (NoneType check)
+    if result is None:
+        newID = 1
+    else:
+        newID = result[0] + 1
 
-# addBorrower(Email: str):
-# adds a borrower with given fields to the database
-def addBorrower(Email: str):
-    # fetch latest ID to populate the new ID field with
-    prevID = cur.execute("SELECT ID FROM borrower ORDER BY ID DESC")
-    prevID = cur.fetchone()[0]
+    # 2. Insert into the 2 columns your table actually has: ID and Email
+    # We use ? placeholders for security and to handle the str() conversion
+    query = "INSERT INTO borrower (ID, Email) VALUES (?, ?)"
+    cur.execute(query, (newID, str(Email)))
 
-    # str() everything else
-    Email = str(Email)
-    cur.execute("INSERT INTO borrower VALUES (" + str(prevID + 1 if prevID != None else 1) + ",\'" + Email + "\')")
+    # commit changes to db file
+    conn.commit()
 
-# call function with passed arguments
-addBorrower(str(sys.argv[1]))
-
-# commit changes to db file
-db.commit()
-
-# close db connection
-db.close()
+    return newID
