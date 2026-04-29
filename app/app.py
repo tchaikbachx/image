@@ -14,6 +14,7 @@ import addMissing
 import emptyTrash
 import deleteEntry
 import updateCheckout #THIS NEEDS TO BE FIXED STILL... THE EXTRA COMMAS ARE CAUSING ERROR. WILL NEED TO BE CHANGED
+import getFULLemaillist
 
 from flask import Flask
 
@@ -48,7 +49,7 @@ def initTables():
 # initialize tables
 initTables()
 
-updateCheckout.updateCheckout(db, 3, None, None, None, None, date.today())
+# getFULLemaillist.getFULLemaillist(db)
 
 
 # addCheckout.addCheckout(db, 300, 3, "4/5/27")
