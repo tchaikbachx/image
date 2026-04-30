@@ -1,35 +1,33 @@
-# imports --------------------------------------------------------------------+
-import sys
-import os
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_cors import CORS
+import sys, os
 
+# --- PATH CONFIGURATION ---
+# this should always be functional independent of machine so don't change it
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+APP_DIR = os.path.join(BASE_DIR, 'app')
+
+# add root and app folder to path
+for path in [BASE_DIR, APP_DIR]:
+    if path not in sys.path:
+        sys.path.append(path)
+
+# get path to the database
+db_path = os.path.join(BASE_DIR, 'app', 'database.db')
+
+# can import manager now that path is correct (do not move)
 from manager import manager
 
-# --------------------------- DO NOT CHANGE THIS ----------------------------+
 
-# get the abs path to the directory (kept same naming conventions as in .wsgi)
-# BASE_DIR = os.environ.get('PROJECT_ROOT', os.path.dirname(os.path.abspath(__file__)))
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, BASE_DIR)
-# set up the server variable and load it with the correct file paths.
-# >> path should always be /templates/ for the raw html and anything else
-#    is in /templates/<folder> (for scripts and styling)
-app = Flask(__name__, 
-            template_folder=os.path.join(BASE_DIR, 'templates'),
-            static_folder=os.path.join(BASE_DIR, 'static'))
+# --- APP SETUP ---
+app = Flask(__name__)
+app.secret_key = 'grinnell_secret_key' # this will have to be changed for security
 CORS(app)
 
-
-# get the path of the database itself independent of the machine, then set it
-# up with the manager to funnel commands through.
-# >> database resides in its own container when deployed
-db_path = os.path.join(os.path.dirname(__file__), 'app', 'database.db')
 db = manager(db_path)
 
-# ----------------------------- STATIC ROUTING -------------------------------+
 
+# --- STATIC ROUTES ---
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -38,147 +36,75 @@ def index():
 def dashboard():
     return render_template('dash.html')
 
-# # when viewing homepage, append the '/' tag to the url
-# @app.route('/')
-# def index():
-#     return send_from_directory(app.template_folder, 'index.html')
 
+# --- GENERAL API ROUTES ---
 
-# # when viewing dashboard, append the '/dashboard' tag to the url
-# @app.route('/dashboard')
-# def dash():
-#     return send_from_directory(app.template_folder, 'dash.html')
-
-
-# # this may be deprecated
-# @app.route('/templates/<path:filename>')
-# def stat(filename):
-#     return send_from_directory(app.static_folder, filename)
-
-# ------------------------------- TEMP LOGIN ---------------------------------+
-
-app.secret_key = 'grinnell_secret_key' # necessary to gain permissions
-
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-
-    # hardcoded credentials
-    if username == "admin" and password == "1234":
-        session['is_staff'] = True # set flag
-        return jsonify({"status": "success"}), 200
-    else:
-        return jsonify({"status": "error", "message": "Invalid credentials"}), 401
-
-@app.route('/logout')
-def logout():
-    session.pop('is_staff', None)
-    return redirect(url_for('index'))
-
-# ----------------------------- DYNAMIC ROUTING ------------------------------+
-
-# generalized get method, are used for any function that retrieves the data.
-# >> EX: displaying instruments in cards and additional instrument information
 @app.route('/api/<table_name>', methods=['GET'])
-def get_table(table_name):
+def get_entry(table_name):
     try:
-        data = db.status() if table_name == 'instrument' else db.fetch(table_name)
-        return jsonify(data), 200
+        if request.method == 'GET':
+            # join logic for the main instrument dash
+            if table_name == 'instrument':
+                data = db.status(table_name)
+            else:
+                data = db.fetch_all(table_name)
+            return jsonify(data), 200
+
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 501
+        app.logger.error(f"API ERROR on {table_name}: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/<table_name>/<int:entry_id>', methods=['PUT'])
+def put_entry(table_name, entry_id):
+    try:
+        if request.method == 'PUT':
+            data = request.get_json()
+            for key in ['Status', 'ID']:
+                data.pop(key, None)
+            success = db.update(table_name, entry_id, data)
+            return jsonify({"status": "updated" if success else "no change"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 
-@app.route('/api/instrument', methods=['POST'])
-def add_instrument():
+@app.route('/api/<table_name>', methods=['POST'])
+def add_entry(table_name):
     try:
-        data = request.get_json()
-        # sanitize the data
-        data.pop('Status', None)
-        data.pop('ID', None) 
-        
-        new_id = db.add('instrument', data)
+        payload = request.get_json()
+        new_id = db.add(table_name, payload) 
         return jsonify({"status": "success", "id": new_id}), 201
     except Exception as e:
-        print(f"Add Error: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 502
+        return jsonify({"error": str(e)}), 500
     
 
-@app.route('/api/checkout', methods=['POST'])
-def checkout_api():
-    data = request.get_json()
-    email = data.get('email')
-    item_id = data.get('Item_ID')
-    due_date = data.get('Due_Date')
-
-    # find or create borrower
-    borrower = db.fetch('borrower')
-    borrower_match = next((b for b in borrower if b['Email'] == email), None)
-    
-    if not borrower_match:
-        borrower_id = db.add('borrower', {'Email': email})
-    else:
-        borrower_id = borrower_match['ID']
-
-    # add checkout to record
-    db.add('checkout', {
-        'Borrower_ID': borrower_id,
-        'Item_ID': item_id,
-        'Due_Date': due_date
-    })
-    
-    return jsonify({"status": "success"}), 201
-
-
-@app.route('/api/history/<item_id>')
-def get_history(item_id):
-    # join two databases (checkout/instruments)
+@app.route('/api/checkouts/<int:item_id>', methods=['GET'])
+def get_item_checkouts(item_id):
+    # for emails in sidebar
     query = """
-        SELECT c.*, b.Email 
+        SELECT c.ID, b.Email, c.Due_Date 
         FROM checkout c
         JOIN borrower b ON c.Borrower_ID = b.ID
-        WHERE c.Item_ID = ?
-        ORDER BY c.Checkout_Date DESC
+        WHERE c.Item_ID = ? AND c.Closed_Date IS NULL
     """
-    with db.get() as conn:
-        cur = conn.cursor()
-        cur.execute(query, (item_id,))
-        return jsonify([dict(row) for row in cur.fetchall()])
+    results = db.query_db(query, (item_id,))
+    return jsonify(results)
 
 
-@app.route('/api/instrument/<int:entry_id>', methods=['PUT'])
-def update_instrument(entry_id):
+@app.route('/api/<table_name>/<int:entry_id>', methods=['DELETE'])
+def delete_entry(table_name, entry_id):
     try:
-        data = request.get_json()
-        
-        data.pop('Status', None)
-        data.pop('ID', None)
-        
-        success = db.update('instrument', entry_id, data)
-        return jsonify({"status": "success" if success else "no change"}), 200
+        success = db.delete(table_name, entry_id) 
+        return jsonify({"status": "deleted" if success else "not found"}), 200
     except Exception as e:
-        print(f"Update Error on ID {entry_id}: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 503
+        return jsonify({"error": str(e)}), 500
 
 
-# generalized delete method; there is only one 'delete' method, but it
-# can be used in multiple tables.
-@app.route('/api/instrument/<int:entry_id>', methods=['DELETE'])
-def delete_instrument(entry_id):
-    try:
-        success = db.delete('instrument', entry_id)
-        return jsonify({"status": "success" if success else "not found"}), 200
-    except Exception as e:
-        print(f"Delete Error: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 504
-
-
-# for debugging purposes when running on local ports; it should not be
-# included in the live version
+# --- EXECUTION ---
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    print(f"opened at http://0.0.0.0:{port}")
-    app.run(host='0.0.0.0', port=port)
+    # log path for sanity
+    print(f"--- DB PATH: {db_path} ---")
+    app.run(host='0.0.0.0', port=5005, debug=True)
 
 application = app

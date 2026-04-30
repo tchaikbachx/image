@@ -1,123 +1,121 @@
-import os
-import sys
-import datetime
-import sqlite3
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'app'))
+import sqlite3, sys, os
 
 # ADD
-from addBorrower import addBorrower as aborr
-from addBroken import addBroken as abrok
-from addCheckout import addCheckout as achek
-from addDepartment import addDepartment as adepa
-from addInstrument import addInstrument as ainst
-from addKkey import addKkey as akkey
-from addLocker import addLocker as alock
-from addMissing import addMissing as amiss
+from app.addBorrower import addBorrower as aborr
+from app.addBroken import addBroken as abrok
+from app.addCheckout import addCheckout as achek
+from app.addDepartment import addDepartment as adept
+from app.addInstrument import addInstrument as ainst
+from app.addKkey import addKkey as akkey
+from app.addLocker import addLocker as alock
+from app.addMissing import addMissing as amiss
 
 # UPDATE
-from updateBorrower import updateBorrower as uborr
-from updateBroken import updateBroken as ubrok
-from updateCheckout import updateCheckout as uchek
-from updateDepartment import updateDepartment as udepa
-from updateInstrument import updateInstrument as uinst
-from updateKkey import updateKkey as ukkey
-from updateLocker import updateLocker as ulock
-from updateMissing import updateMissing as umiss
+from app.updateBorrower import updateBorrower as uborr
+from app.updateBroken import updateBroken as ubrok
+from app.updateCheckout import updateCheckout as uchek
+from app.updateDepartment import updateDepartment as udept
+from app.updateInstrument import updateInstrument as uinst
+from app.updateKkey import updateKkey as ukkey
+from app.updateLocker import updateLocker as ulock
+from app.updateMissing import updateMissing as umiss
 
-# DELETE
-from deleteEntry import deleteEntry
+# DELETE/MISC
+from app.updateIfNotNull import uINN
+from app.deleteEntry import deleteEntry as trash
+from app.emptyTrash import emptyTrash as clear
 
-# -----------------------------------------------------------
+# +------------------------------------------------------+
 
-# separated the function out so that the server is divided from
-# the database to meet abstraction goal (and it is cleaner).
+# does the actual database CRUD work
 class manager:
     def __init__(self, db_path):
         self.path = db_path
-        self.add_map = {
-            'borrower': aborr,
-            'broken': abrok,
-            'checkout': achek,
-            'department': adepa,
-            'instrument': ainst,
-            'key': akkey,
-            'lock': alock,
-            'missing': amiss
-        }
+        # local debugging
+        if os.path.exists(self.path):
+            print(f"--- DB CONNECTED: {self.path} ({os.path.getsize(self.path)} bytes) ---")
+        else:
+            print(f"--- WARNING: DB NOT FOUND AT {self.path} ---")
 
-        self.update_map = {
-            'borrower': uborr,
-            'broken': ubrok,
-            'checkout': uchek,
-            'department': udepa,
-            'instrument': uinst,
-            'key': ukkey,
-            'lock': ulock,
-            'missing': umiss
-        }
-
-
-    def get(self):
+    def get_conn(self):
         conn = sqlite3.connect(self.path)
         conn.row_factory = sqlite3.Row
         return conn
-    
 
-    def fetch(self, table):
-        with self.get() as conn:
-            cur = conn.cursor()
-            cur.execute(f"SELECT * FROM {table}")
-            return [dict(row) for row in cur.fetchall()]
-        
-
-    def status(self):
+    # links instruments to checkouts, so can display in/out properly
+    def status(self, table_name):
         query = """
-            SELECT i.*,
-            CASE WHEN c.Item_ID IS NOT NULL THEN 'OUT' ELSE 'IN' END as Status
-            FROM instrument i
-            LEFT JOIN checkout c ON i.Name_ID = c.Item_ID
+            SELECT t.*, 
+            (SELECT COUNT(*) FROM checkout WHERE Item_ID = t.ID AND Closed_Date IS NULL) as Loan_Count,
+            CASE 
+                WHEN m.Item_ID IS NOT NULL AND m.Date_Found IS NULL THEN 'MISSING'
+                WHEN b.Item_ID IS NOT NULL AND b.Date_Fixed IS NULL THEN 'BROKEN'
+                ELSE 'AVAILABLE'
+            END as Availability
+            FROM instrument t
+            LEFT JOIN missing m ON t.ID = m.Item_ID AND m.Date_Found IS NULL
+            LEFT JOIN broken b ON t.ID = b.Item_ID AND b.Date_Fixed IS NULL
         """
-        with self.get() as conn:
+        try:
+            with self.get_conn() as conn:
+                cur = conn.cursor()
+                cur.execute(query)
+                return [dict(row) for row in cur.fetchall()]
+        except sqlite3.OperationalError as e:
+            print(f"DATABASE ERROR in status(): {e}")
+            return []
+
+    # generic fetch for all tables
+    def fetch_all(self, table_name):
+        """Generic fetch for non-dashboard tables like 'department' or 'borrower'."""
+        with self.get_conn() as conn:
             cur = conn.cursor()
-            cur.execute(query)
+            cur.execute(f"SELECT * FROM {table_name}")
             return [dict(row) for row in cur.fetchall()]
 
-
-    def delete(self, table, id):
-        with self.get() as conn:
-            cur = conn.cursor()
-            cur.execute(f"DELETE FROM {table} WHERE ID = ?", (id,))
-            conn.commit()
-            return cur.rowcount > 0
-
-
+    # generic add for tables
     def add(self, table, data):
-        if table not in self.add_map:
-            raise ValueError(f"No add method defined for table: {table}")
-        
-        with self.get() as conn:
-            return self.add_map[table](conn, **data)
-        
+        logic_map = {
+            'borrower': aborr,
+            'broken': abrok,
+            'checkout': achek,
+            'department': adept,
+            'instrument': ainst,
+            'kkey': akkey,
+            'locker': alock,
+            'missing': amiss
+        }
 
+        if table not in logic_map:
+            raise ValueError(f"No add functions found for: {table}")
+        with self.get_conn() as conn:
+            return logic_map[table](conn, **data)
+
+    # generic update for tables 
     def update(self, table, entry_id, data):
-        # data dictionary {'Type': 'Horn', 'Make': 'Yamaha'}
-        if not data:
-            return False
+        logic_map = {
+            'borrower': uborr,
+            'broken': ubrok,
+            'checkout': uchek,
+            'department': udept,
+            'instrument': uinst,
+            'kkey': ukkey,
+            'locker': ulock,
+            'missing': umiss
+        }
+        if table not in logic_map:
+            raise ValueError(f"No update logic found for: {table}")
+        
+        with self.get_conn() as conn:
+            # id is first arg then trust backend to unpack the rest
+            return logic_map[table](conn, entry_id, **data)
 
-        keys = [f"{k} = ?" for k in data.keys()]
-        query = f"UPDATE {table} SET {', '.join(keys)} WHERE ID = ?"
-        
-        # combine values [value1, value2, ..., entry_id]
-        params = list(data.values()) + [entry_id]
-        
-        with self.get() as conn:
-            cur = conn.cursor()
-            try:
-                cur.execute(query, params)
-                conn.commit()
-                return cur.rowcount > 0
-            except Exception as e:
-                # this is for debugging in browser console
-                print(f"SQL Error: {query} with params {params}")
-                raise e
+    # delete an entry
+    def delete(self, table, entry_id):
+        with self.get_conn() as conn:
+            return trash(conn, table, entry_id)
+
+    # clear the trashcan
+    def clear_trash(self):
+        with self.get_conn() as conn:
+            return clear(conn)
