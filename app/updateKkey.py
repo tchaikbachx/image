@@ -8,7 +8,7 @@ def updateKkey(conn: Connection, ID: int, Name_ID: str, Qty: int, Description: s
     # set cursor for db interaction
     cur = conn.cursor()
 
-    cur.execute("UPDATE broken SET " + updateIfNotNull.uINN("Name_ID", Name_ID) + ", " + updateIfNotNull.uINN("Qty", Qty) + ", " + updateIfNotNull.uINN("Description", Description) + " WHERE ID = " + str(ID))
+    cur.execute("UPDATE kkey SET " + updateIfNotNull.uINN("Name_ID", Name_ID) + ", " + updateIfNotNull.uINN("Qty", Qty) + ", " + updateIfNotNull.uINN("Description", Description) + " WHERE ID = " + str(ID))
 
     # commit changes to db file
     conn.commit()

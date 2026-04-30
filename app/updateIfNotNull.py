@@ -1,8 +1,12 @@
 # updateIfNotNull(FieldName: str, change):
-# contains the string to update 'Field' to a new entry if the given `change`` is non-empty
+# contains the string to update 'Field' to a new entry if the given `change`` is non-empty.
+# >> added another check condition
 def updateIfNotNull(FieldName: str, change):
-    if change != None:
-        return (FieldName + " = " + str(change))
+    if change is not None and change != "":
+        # >> wrapped in single quotes if string
+        if isinstance(change, str):
+            return f"{FieldName} = '{change}'"
+        return f"{FieldName} = {change}"
     else:
         return ""
 

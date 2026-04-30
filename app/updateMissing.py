@@ -8,7 +8,7 @@ def updateMissing(conn: Connection, ID: int, Date_Missing: str, Date_Found: str,
     # set cursor for db interaction
     cur = conn.cursor()
 
-    cur.execute("UPDATE broken SET " + updateIfNotNull.uINN("Date_Missing", Date_Missing) + ", " + updateIfNotNull.uINN("Date_Found", Date_Found) + ", " + updateIfNotNull.uINN("Item_ID", Item_ID) + ", " + updateIfNotNull.uINN("Description", Description) + " WHERE ID = " + str(ID))
+    cur.execute("UPDATE missing SET " + updateIfNotNull.uINN("Date_Missing", Date_Missing) + ", " + updateIfNotNull.uINN("Date_Found", Date_Found) + ", " + updateIfNotNull.uINN("Item_ID", Item_ID) + ", " + updateIfNotNull.uINN("Description", Description) + " WHERE ID = " + str(ID))
 
     # commit changes to db file
     conn.commit()
