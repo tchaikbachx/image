@@ -3,15 +3,27 @@ import sqlite3
 import updateIfNotNull
 
 # updateLocker(ID: int, Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
+# >> where args contains the list of data to be updated
 # updates a locker record with given fields in the database
-def updateLocker(conn: Connection, ID: int, Name_ID: str, Combo: str, Kkey: int, Checkoutable: bool):
-    # set cursor for db interaction
+def updateLocker(conn, ID, **args):
     cur = conn.cursor()
+    
+    # filter out None values to build <set>
+    updates = []
+    params = []
+    
+    for key, value in args.items():
+        if value is not None:
+            updates.append(f"{key} = ?")
+            params.append(value)
+    
+    if not updates:
+        return False
 
-    cur.execute("UPDATE locker SET " + updateIfNotNull.uINN("Name_ID", Name_ID) + ", " + updateIfNotNull.uINN("Combo", Combo) + ", " + updateIfNotNull.uINN("Kkey", Kkey) + ", " + updateIfNotNull.uINN("Checkoutable", Checkoutable) + " WHERE ID = " + str(ID))
-
-    # commit changes to db file
+    # dynamically build string
+    sql = f"UPDATE locker SET {', '.join(updates)} WHERE ID = ?"
+    params.append(ID)
+    
+    cur.execute(sql, params)
     conn.commit()
-
-    # empty table check
     return cur.rowcount > 0
