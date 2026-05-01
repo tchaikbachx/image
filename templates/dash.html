@@ -7,224 +7,402 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
   <title>Tchaikbachx | Inventory</title>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="/static/script/app.js"></script>
+  <script src="/static/script/app.js?v=1.1"></script>
 </head>
 
 <body x-data="inventory" data-logged-in="{{ 'true' if session.get('is_staff') else 'false' }}">
   <nav id="mainNav" class="navbar">
-    <a href="/" class="nav-link">Home</a>
+    <div class="nav-container">
+      <!-- visible to everyone -->
+      <a href="/" class="nav-link">Home</a>
+      {% if session.get('is_staff') %}
+      <a href="/logout" class="nav-link">Logout</a>
+      {% else %}
+      {% endif %}
+    </div>
   </nav>
 
   <main class="content">
-    <header class="dept-banner">
+    <div class="dashboard-tabs">
+      <button :class="activeTable === 'instrument' ? 'tab-active' : ''"
+        @click="switchTable('instrument')">Instruments</button>
+
+      {% if session.get('is_staff') %}
+      <button :class="activeTable === 'kkey' ? 'tab-active' : ''" @click="switchTable('kkey')">Keys</button>
+
+      <button :class="activeTable === 'locker' ? 'tab-active' : ''" @click="switchTable('locker')">Lockers</button>
+      {% endif %}
+    </div>
+
+    <!-- <header class="dept-banner">
       <h1>Inventory Dashboard</h1>
-    </header>
+    </header> -->
 
     <div class="dashboard-box">
       <div class="dashboard-main-content">
         <nav class="toolbar-container">
           <div class="search-wrapper">
-            <input type="text" placeholder="Search by name, type, make, or model..." x-model="searchQuery">
-            <button class="btn-advanced" @click="showAdvancedModal = true">
-              Filter
+            <input type="text" :placeholder="'Search for an item...'" x-model="searchQuery">
+            <button class="btn-advanced btn-tool icon-btn"
+              :class="{ 'filter-applied': Object.values(filters).some(v => v !== '' && v !== 9999) }"
+              @click="showAdvancedModal = true">
+              Filter <span x-show="Object.values(filters).filter(v => v !== '' && v !== 9999).length > 0"
+                x-text="'(' + Object.values(filters).filter(v => v !== '' && v !== 9999).length + ')'"></span>
             </button>
           </div>
           <div class="staff-controls" x-show="isStaff">
-            <button class="btn-tool btn-add" @click="openAddModal()">Add</button>
-            <button class="btn-tool btn-edit" :class="{ 'active': isEditMode }" @click="toggleEditMode()">Edit</button>
-            <button class="btn-tool btn-delete" :class="{ 'active': isDeleteMode }"
+            <button class="btn-tool btn-add icon-btn"
+              @click="isEditMode = false; isDeleteMode = false; newEntry = {}; showAddModal = true">
+              Add
+            </button>
+            <button class="btn-tool btn-edit icon-btn" :class="{ 'active': isEditMode }"
+              @click="toggleEditMode()">Edit</button>
+            <button class="btn-tool btn-delete icon-btn" :class="{ 'active': isDeleteMode }"
               @click="toggleDeleteMode()">Delete</button>
           </div>
         </nav>
 
-        <div class="main-inventory-layout">
+        <div class="main-inventory-layout" :class="{ 'sidebar-active': selectedEntry && !isEditMode && !isDeleteMode }">
+          <!-- GENERALIZED LIST VIEW -->
           <div class="scroll-container">
             <div class="instrument-grid">
-              <template x-for="entry in filteredInstruments" :key="entry.ID">
+              <template x-for="entry in filteredEntries" :key="entry.ID">
                 <div class="instrument-card" :class="{ 
                   'mode-edit-active': isEditMode,
                   'mode-delete-active': isDeleteMode,
-                  'selected-highlight': selectedInstrument?.ID === entry.ID && !isEditMode && !isDeleteMode
-              }" @click="handleCardClick(entry)">
+                  'selected-highlight': selectedEntry?.ID === entry.ID
+                }" @click="handleCardClick(entry)">
 
                   <div class="card-horizontal-section">
                     <h3 x-text="entry.Name_ID"></h3>
-                    <span class="status-badge" :class="entry.Status === 'IN' ? 'status-in' : 'status-out'"
-                      x-text="entry.Status"></span>
+                    <template x-if="entry.Availability">
+                      <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <span class="status-badge" :class="{
+                          'status-in': entry.Availability === 'AVAILABLE',
+                          'status-out': entry.Availability === 'OUT',
+                          'status-missing': entry.Availability === 'MISSING',
+                          'status-broken': entry.Availability === 'BROKEN'
+                      }" x-text="entry.Loan_Count > 0 ? 'OUT (' + entry.Loan_Count + ')' : entry.Availability"></span>
+                      </div>
+                    </template>
                   </div>
 
                   <div class="card-horizontal-data">
-                    <div class="detail-item">
-                      <strong>Type:</strong>
-                      <span x-text="entry.Type"></span>
-                    </div>
-                    <div class="detail-item">
-                      <strong>Make:</strong>
-                      <span x-text="entry.Make"></span>
-                    </div>
-                    <div class="detail-item">
-                      <strong>Model:</strong>
-                      <span x-text="entry.Model"></span>
-                    </div>
+                    <template x-if="activeTable === 'instrument'">
+                      <div class="instrument-grid-row">
+                        <div class="grid-col"><span class="label">Type:</span><span class="value"
+                            x-text="entry.Type"></span></div>
+                        <div class="grid-col"><span class="label">Make:</span><span class="value"
+                            x-text="entry.Make"></span></div>
+                        <div class="grid-col"><span class="label">Model:</span><span class="value"
+                            x-text="entry.Model"></span></div>
+                      </div>
+                    </template>
+                    <template x-if="activeTable === 'kkey'">
+                      <div class="detail-item"><strong>Qty:</strong> <span x-text="entry.Qty"></span></div>
+                    </template>
+                    <template x-if="activeTable === 'locker'">
+                      <div class="detail-item"><strong>Combo:</strong> <span x-text="entry.Combo"></span></div>
+                    </template>
                   </div>
 
                   <template x-if="isStaff && isDeleteMode">
-                    <button @click.stop="deleteInstrument(entry.ID)" class="btn-delete-small">🞪</button>
+                    <button @click.stop="deleteEntry(entry.ID)" class="btn-delete-small">🞪</button>
                   </template>
                 </div>
               </template>
             </div>
           </div>
 
-          <aside id="details-sidebar" x-show="selectedInstrument" x-cloak :class="{ 'active': selectedInstrument }">
-            <div class="sidebar-header">
-              <div class="header-main">
-                <h2 x-text="selectedInstrument?.Name_ID"></h2>
-                <span class="status-badge-large" :class="selectedInstrument?.Status"
-                  x-text="selectedInstrument?.Status"></span>
-              </div>
-              <button class="close-btn" @click="selectedInstrument = null">&times;</button>
-            </div>
+          <aside id="details-sidebar" x-show="selectedEntry && !isEditMode && !isDeleteMode" x-cloak
+            x-transition:enter="transition-all ease-out duration-300" x-transition:enter-start="sidebar-closed"
+            x-transition:enter-end="sidebar-open" x-transition:leave="transition-all ease-in duration-300"
+            x-transition:leave-start="sidebar-open" x-transition:leave-end="sidebar-closed">
 
-            <div class="sidebar-tabs">
-              <button class="tab-btn" :class="{ 'active': currentTab === 'details' }"
-                @click="currentTab = 'details'">Details</button>
-              <button class="tab-btn" x-show="isStaff" :class="{ 'active': currentTab === 'manage' }"
-                @click="currentTab = 'manage'">
-                Manage
-              </button>
-              <button class="tab-btn" x-show="isStaff" :class="{ 'active': currentTab === 'history' }"
-                @click="currentTab = 'history'; fetchHistory(selectedInstrument.Name_ID)">
-                History
-              </button>
-            </div>
+            <div class="sidebar-content-wrapper" x-show="selectedEntry"
+              x-transition:enter="transition ease-out duration-200 delay-100" x-transition:enter-start="opacity-0"
+              x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-100"
+              x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
 
-            <div class="sidebar-body">
-              <div x-show="currentTab === 'details'" class="tab-content">
-                <div class="detail-group">
-                  <h4>General Info</h4>
-                  <div class="detail-row"><span>Current ID</span><strong x-text="selectedInstrument?.Name_ID"></strong>
-                  </div>
-                  <div class="detail-row"><span>Type</span><strong x-text="selectedInstrument?.Type"></strong></div>
-                  <div class="detail-row"><span>Grade</span><strong x-text="selectedInstrument?.Grade"></strong></div>
-                </div>
-
-                <div class="detail-group">
-                  <h4>Manufacturer Info</h4>
-                  <div class="detail-row"><span>Make</span><strong x-text="selectedInstrument?.Make"></strong></div>
-                  <div class="detail-row"><span>Model</span><strong x-text="selectedInstrument?.Model"></strong></div>
-                  <div class="detail-row"><span>Serial Number</span><strong
-                      x-text="selectedInstrument?.Serial_Number"></strong></div>
-                </div>
-
-                <template x-if="isStaff">
-                  <div class="detail-group admin-only">
-                    <h4>Inventory Management</h4>
-                    <div class="detail-row"><span>Old ID</span><strong
-                        x-text="selectedInstrument?.Old_ID || 'N/A'"></strong></div>
-                    <div class="detail-row">
-                      <span>Value</span>
-                      <strong
-                        x-text="selectedInstrument?.Price ? '$' + Number(selectedInstrument.Price).toLocaleString() : 'N/A'"></strong>
-                    </div>
-                    <div class="detail-row">
-                      <span>Storage Location</span>
-                      <strong
-                        x-text="selectedInstrument?.Stored_In ? 'Locker #' + selectedInstrument.Stored_In : 'Unassigned'"></strong>
-                    </div>
-                    <div class="detail-row">
-                      <span>Department ID</span>
-                      <strong x-text="selectedInstrument?.Dept"></strong>
-                    </div>
-                  </div>
-                </template>
-
+              <div class="sidebar-header">
+                <h2 x-text="selectedEntry?.Name_ID"></h2>
+                <button class="close-btn" @click="selectedEntry = null; currentTab = 'details'">&times;</button>
               </div>
 
-              <div id="manage-content" class="tab-pane" :class="{ 'active': currentTab === 'manage' }"
-                x-show="currentTab === 'manage'">
-                <div class="action-card">
-                  <template x-if="selectedInstrument?.Status === 'IN'">
-                    <div class="checkout-ui">
-                      <h3>Checkout Instrument</h3>
-                      <p class="date-hint">Due Date: <span x-text="threeMonthsFromToday"></span></p>
-                      <div class="field">
-                        <label>Borrower Email</label>
-                        <input type="email" x-model="checkoutEmail" placeholder="student@grinnell.edu">
+              <div class="sidebar-tabs">
+                <button class="tab-btn" :class="{ 'active': currentTab === 'details' }"
+                  @click="currentTab = 'details'">Details</button>
+                <button class="tab-btn" x-show="isStaff" :class="{ 'active': currentTab === 'manage' }"
+                  @click="currentTab = 'manage'">
+                  Manage
+                </button>
+                <button class="tab-btn" x-show="isStaff" :class="{ 'active': currentTab === 'history' }"
+                  @click="currentTab = 'history'; if(selectedEntry) fetchHistory(selectedEntry.Name_ID)">
+                  History
+                </button>
+              </div>
+
+              <div class="sidebar-body">
+                <!-- CATEGORY-SPECIFIC DETAILS -->
+                <div x-show="currentTab === 'details'" class="tab-content">
+
+                  <template x-if="activeTable === 'instrument'">
+                    <div class="detail-group">
+                      <div class="detail-row"><span>Current ID</span><strong x-text="selectedEntry?.Name_ID"></strong>
                       </div>
-                      <button class="btn-primary full-width" @click="submitCheckout()">Confirm</button>
+                      <div class="detail-row"><span>Type</span><strong x-text="selectedEntry?.Type"></strong></div>
+                      <div class=" detail-row"><span>Grade</span><strong x-text="selectedEntry?.Grade"></strong>
+                      </div>
+
+                      <div class="detail-row"><span>Make</span><strong x-text="selectedEntry?.Make"></strong></div>
+                      <div class="detail-row"><span>Model</span><strong x-text="selectedEntry?.Model"></strong></div>
+                      <div class="detail-row"><span>Serial Number</span><strong
+                          x-text="selectedEntry?.Serial_Number"></strong></div>
+
+                      <template x-if="isStaff">
+                        <div class="detail-group admin-only">
+                          <div class="detail-row"><span>Old ID</span><strong
+                              x-text="selectedEntry?.Old_ID || 'N/A'"></strong>
+                          </div>
+                          <div class=" detail-row">
+                            <span>Value</span>
+                            <strong
+                              x-text="selectedEntry?.Price ? '$' + Number(selectedEntry?.Price).toLocaleString() : 'N/A'"></strong>
+                          </div>
+                          <div class="detail-row">
+                            <span>Location</span>
+                            <strong x-text="'Locker ' + selectedEntry?.Locker_Name || 'Unassigned'"></strong>
+                          </div>
+                          <div class="detail-row">
+                            <span>Key</span>
+                            <strong x-text="selectedEntry?.Key_Name || 'None'"></strong>
+                          </div>
+                          <div class=" detail-row">
+                            <span>Department ID</span>
+                            <strong x-text="selectedEntry?.Dept"></strong>
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </template>
 
-                  <template x-if="selectedInstrument?.Status === 'OUT'">
-                    <div class="checkin-ui">
-                      <p>This item is currently <strong>Checked Out</strong>.</p>
-                      <button class="btn-primary full-width" @click="returnInstrument(selectedInstrument.Name_ID)"
-                        style="background-color: var(--status-out);">
-                        Return Instrument
-                      </button>
-                    </div>
-                  </template>
-                </div>
-              </div>
 
-              <div id="history-content" class="tab-pane" :class="{ 'active': currentTab === 'history' }"
-                x-show="currentTab === 'history'">
-                <div class="history-list">
-                  <template x-if="instrumentHistory.length === 0">
-                    <p class="empty-msg">No checkout history found.</p>
-                  </template>
-                  <template x-for="log in instrumentHistory">
-                    <div class="history-item">
-                      <div class="log-email" x-text="log.Email"></div>
-                      <div class="log-dates">
-                        <span x-text="'Out: ' + log.Checkout_Date"></span>
-                        <span x-text="'Due: ' + log.Due_Date"></span>
+                  <template x-if="activeTable === 'locker'">
+                    <div class="detail-group">
+                      <div class="detail-row">
+                        <span>Locker Number</span>
+                        <strong x-text="selectedEntry?.Name_ID"></strong>
+                      </div>
+                      <div class="detail-row">
+                        <span>Combination</span>
+                        <strong x-text="selectedEntry?.Combo"></strong>
+                      </div>
+                      <div class="detail-row">
+                        <span>Key Required</span>
+                        <strong x-text="selectedEntry?.Key_Name || selectedEntry?.Kkey || 'None'"></strong>
                       </div>
                     </div>
+                    <div class="detail-item">
+                      <strong>Checkoutable?</strong>
+                      <select x-model="editTarget.Checkoutable">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                      </select>
+                    </div>
+                  </template>
+
+                  <template x-if="activeTable === 'kkey'">
+                    <div class="detail-group">
+                      <div class="detail-row">
+                        <span>Key Number</span>
+                        <strong x-text="selectedEntry?.Name_ID"></strong>
+                      </div>
+                      <div class="detail-row">
+                        <span>Quantity</span>
+                        <strong x-text="selectedEntry?.Qty"></strong>
+                      </div>
+                      <div class="detail-row">
+                        <span>Description</span>
+                        <strong x-text="selectedEntry?.Description"></strong>
+                      </div>
+                    </div>
                   </template>
                 </div>
+
+                <div id="manage-content" class="tab-pane" x-show="currentTab === 'manage'">
+                  <div class="checkout-ui">
+                    <h3>New Checkout</h3>
+
+                    <div class="date-hint">
+                      <span>This item will be due on</span>
+                      <strong x-text="threeMonthsFromToday"></strong>
+                    </div>
+
+                    <div class="checkout-input-group">
+                      <label>Borrower Email</label>
+                      <input type="email" x-model="checkoutEmail" placeholder="name@grinnell.edu"
+                        @keyup.enter="submitCheckout(selectedEntry.ID, activeTable)">
+                    </div>
+
+                    <button class="btn-primary sleek-btn" @click="submitCheckout(selectedEntry.ID, activeTable)">
+                      <span>Complete Checkout</span>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14m-7-7 7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="active-loans-list" style="margin-top: 24px;">
+                    <h4>Current Borrowers</h4>
+                    <div class="loan-container">
+                      <template x-for="loan in activeLoans" :key="loan.ID">
+                        <div class="loan-row">
+                          <div class="loan-details">
+                            <div class="loan-info-main" x-text="loan.Email"></div>
+                            <div class="loan-info-sub">
+                              <span>
+                                <span class="date-label">Out:</span>
+                                <span x-text="loan.Checkout_Date || 'N/A'"></span>
+                              </span>
+                              <span>
+                                <span class="date-label">Due:</span>
+                                <span x-text="loan.Due_Date"></span>
+                              </span>
+                            </div>
+                          </div>
+                          <button class="btn-return-action" @click="returnEntry(loan.ID)">
+                            RETURN
+                          </button>
+                        </div>
+                      </template>
+
+                      <template x-if="activeLoans.length === 0">
+                        <div
+                          style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.8rem; border: 1px dashed var(--border); border-radius: 8px;">
+                          No active loans.
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div x-show="currentTab === 'history'" class="tab-content">
+                  <!-- history list rendering needs to be put here -->
+                </div>
+
               </div>
+
             </div>
-          </aside>
 
         </div>
-
       </div>
-    </div>
   </main>
 
-  <div class="modal" :class="{ 'active': showAddModal }" x-show="showAddModal" x-cloak>
+  <div class="modal" :class="{ 'active': showEmailModal }" x-show="showEmailModal" x-cloak>
     <div class="modal-content">
-      <h2>Add New Instrument</h2>
-      <div class="details-grid">
-        <input type="text" placeholder="Name/ID" x-model="newInstrument.Name_ID">
-        <input type="text" placeholder="Type" x-model="newInstrument.Type">
-        <input type="text" placeholder="Make" x-model="newInstrument.Make">
-        <input type="text" placeholder="Model" x-model="newInstrument.Model">
-        <input type="text" placeholder="Serial #" x-model="newInstrument.Serial_Number">
-        <input type="text" placeholder="Location" x-model="newInstrument.Stored_In">
+      <h2>Confirm Checkout Email</h2>
+      <div class="input-group">
+        <label>Subject</label>
+        <input type="text" x-model="emailSubject">
       </div>
+      <div class="input-group">
+        <label>Message Body</label>
+        <textarea x-model="emailBody" style="width: 100%; height: 150px; border-radius: 6px; padding: 10px;"></textarea>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
+        Clicking confirm will open your email client and update the database.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-secondary" @click="showEmailModal = false">Cancel</button>
+        <button class="btn-primary" @click="finalizeCheckout()">Confirm & Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" :class="{ 'active': showAddModal }" x-show="showAddModal">
+    <div class="modal-content">
+      <h2 x-text="'Add New ' + activeTable"></h2>
+
+      <div class="details-grid">
+        <div class="detail-item">
+          <label>Identifier (Name_ID)</label>
+          <input type="text" :placeholder="activeTable === 'locker' ? 'Locker #' : 'Name/ID'"
+            x-model="newEntry.Name_ID">
+        </div>
+
+        <template x-if="activeTable === 'instrument'">
+          <div style="display: contents;">
+            <div class="grid-pair">
+              <input type="text" placeholder="Type" x-model="newEntry.Type">
+              <input type="text" placeholder="Make" x-model="newEntry.Make">
+            </div>
+            <input type="text" placeholder="Model" x-model="newEntry.Model">
+            <input type="text" placeholder="Serial Number" x-model="newEntry.Serial_Number">
+          </div>
+        </template>
+
+        <template x-if="activeTable === 'kkey'">
+          <div style="display: contents;">
+            <input type="number" placeholder="Total Quantity" x-model="newEntry.Qty">
+            <input type="text" placeholder="Key Description" x-model="newEntry.Description">
+          </div>
+        </template>
+
+        <template x-if="activeTable === 'locker'">
+          <div style="display: contents;">
+            <input type="text" placeholder="Combination (XX-XX-XX)" x-model="newEntry.Combo">
+            <input type="text" placeholder="Key Code" x-model="newEntry.Kkey">
+            <input type="hidden" x-init="newEntry.Checkoutable = 1">
+          </div>
+        </template>
+      </div>
+
+
       <div class="modal-actions">
         <button class="btn-secondary" @click="showAddModal = false">Cancel</button>
-        <button class="btn-primary" @click="addInstrument()">Confirm</button>
+        <button class="btn-primary" @click="addEntry()">Confirm</button>
       </div>
     </div>
   </div>
 
   <div class="modal" :class="{ 'active': showEditModal }" x-show="showEditModal" x-cloak>
     <div class="modal-content">
-      <h2>Update Instrument <span x-text="editTarget.Name_ID"></span></h2>
+      <!-- Dynamic Header -->
+      <h2>Update <span x-text="activeTable"></span>: <span x-text="editTarget.Name_ID"></span></h2>
+
       <div class="details-grid">
-        <div class="detail-item"><strong>Type</strong><input type="text" x-model="editTarget.Type"></div>
-        <div class="detail-item"><strong>Make</strong><input type="text" x-model="editTarget.Make"></div>
-        <div class="detail-item"><strong>Model</strong><input type="text" x-model="editTarget.Model"></div>
-        <div class="detail-item"><strong>Serial #</strong><input type="text" x-model="editTarget.Serial_Number"></div>
-        <div class="detail-item"><strong>Location</strong><input type="text" x-model="editTarget.Stored_In"></div>
+        <!-- Instrument Fields -->
+        <template x-if="activeTable === 'instrument'">
+          <div style="display: contents;">
+            <div class="detail-item"><strong>Type</strong><input type="text" x-model="editTarget.Type"></div>
+            <div class="detail-item"><strong>Make</strong><input type="text" x-model="editTarget.Make"></div>
+            <div class="detail-item"><strong>Model</strong><input type="text" x-model="editTarget.Model"></div>
+          </div>
+        </template>
+
+        <!-- Key Fields -->
+        <template x-if="activeTable === 'kkey'">
+          <div style="display: contents;">
+            <div class="detail-item"><strong>Quantity</strong><input type="number" x-model="editTarget.Qty"></div>
+            <div class="detail-item"><strong>Description</strong><input type="text" x-model="editTarget.Description">
+            </div>
+          </div>
+        </template>
+
+        <!-- Locker Fields -->
+        <template x-if="activeTable === 'locker'">
+          <div style="display: contents;">
+            <div class="detail-item"><strong>Combo</strong><input type="text" x-model="editTarget.Combo"></div>
+            <div class="detail-item"><strong>Key Code</strong><input type="text" x-model="editTarget.Kkey"></div>
+          </div>
+        </template>
       </div>
+
       <div class="modal-actions">
         <button class="btn-secondary" @click="showEditModal = false">Cancel</button>
-        <button class="btn-primary" @click="updateInstrument()">Confirm</button>
+        <button class="btn-primary" @click="updateEntry()">Confirm</button>
       </div>
     </div>
   </div>
@@ -235,61 +413,97 @@
       <h2>Advanced Search</h2>
 
       <div class="details-grid">
-        <div class="detail-item">
-          <label>Current ID</label>
-          <input type="text" x-model="filters.Name_ID" placeholder="e.g. TR-01">
-        </div>
-        <div class="detail-item">
-          <label>Old ID</label>
-          <input type="text" x-model="filters.Old_ID">
-        </div>
+        <!-- INSTRUMENT SPECIFIC FILTERS -->
+        <template x-if="activeTable === 'instrument'">
+          <div style="display: contents;">
+            <div class="detail-item">
+              <label>Type</label>
+              <input type="text" x-model="filters.Type">
+            </div>
+            <div class="detail-item">
+              <label>Grade</label>
+              <select x-model="filters.Grade">
+                <option value="">Any Grade</option>
+                <option value="A">Grade A</option>
+                <option value="B">Grade B</option>
+                <option value="C">Grade C</option>
+              </select>
+            </div>
 
-        <div class="detail-item">
-          <label>Type</label>
-          <input type="text" x-model="filters.Type">
-          <!-- <select x-model="filters.Type">
-            <option value="">All Types</option>
-            <option value="Brass">Brass</option>
-            <option value="Strings">Strings</option>
-            <option value="Woodwind">Woodwind</option>
-          </select> -->
-        </div>
-        <div class="detail-item">
-          <label>Grade</label>
-          <select x-model="filters.Grade">
-            <option value="">Any Grade</option>
-            <option value="A">Grade A</option>
-            <option value="B">Grade B</option>
-            <option value="C">Grade C</option>
-          </select>
-        </div>
+            <div class="detail-item">
+              <label>Make</label>
+              <input type="text" x-model="filters.Make">
+            </div>
 
-        <div class="detail-item">
-          <label>Make</label>
-          <input type="text" x-model="filters.Make">
-        </div>
-        <div class="detail-item">
-          <label>Model</label>
-          <input type="text" x-model="filters.Model">
-        </div>
-        <div class="detail-item">
-          <label>Serial Number</label>
-          <input type="text" x-model="filters.Serial_Number">
-        </div>
+            <div class="detail-item">
+              <label>Model</label>
+              <input type="text" x-model="filters.Model">
+            </div>
 
-        <div class="detail-item" style="grid-column: span 2;">
-          <label>Max Price: $<span x-text="filters.Price"></span></label>
-          <input type="range" min="0" max="9999" step="100" x-model="filters.Price" style="width: 100%;">
-        </div>
+            <div class="detail-item">
+              <label>Serial Number</label>
+              <input type="text" x-model="filters.Serial_Number">
+            </div>
 
-        <div class="detail-item">
-          <label>Storage Location (ID)</label>
-          <input type="number" x-model="filters.Stored_In">
-        </div>
-        <div class="detail-item">
-          <label>Department (ID)</label>
-          <input type="number" x-model="filters.Dept">
-        </div>
+            <div class="detail-item" style="grid-column: span 2;">
+              <label>Max Price: $<span x-text="filters.Price"></span></label>
+              <input type="range" min="0" max="9999" step="100" x-model="filters.Price" style="width: 100%;">
+            </div>
+
+            <div class="detail-item">
+              <label>Storage Location (ID)</label>
+              <input type="number" x-model="filters.Stored_In">
+            </div>
+
+            <div class="detail-item">
+              <label>Department (ID)</label>
+              <input type="number" x-model="filters.Dept">
+            </div>
+
+            <div class="detail-item">
+              <label>Condition</label>
+              <select x-model="filters.Status">
+                <option value="">All Items</option>
+                <option value="IN">In Stock</option>
+                <option value="OUT">Checked Out</option>
+                <option value="BROKEN">Broken/Repair</option>
+                <option value="MISSING">Missing</option>
+              </select>
+            </div>
+          </div>
+        </template>
+
+        <!-- KEY SPECIFIC FILTERS -->
+        <template x-if="activeTable === 'kkey'">
+          <div style="display: contents;">
+            <div class="detail-item">
+              <label>Key Number</label>
+              <input type="text" x-model="filters.Name_ID" placeholder="Search by key number...">
+            </div>
+            <div class="detail-item">
+              <label>Quantity</label>
+              <input type="number" x-model="filters.Qty" placeholder="Search by numerical copies...">
+            </div>
+          </div>
+        </template>
+
+        <!-- LOCKER SPECIFIC FILTERS -->
+        <template x-if="activeTable === 'locker'">
+          <div style="display: contents;">
+            <div class="detail-item">
+              <label>Locker</label>
+              <input type="text" x-model="filters.Name_ID" placeholder="Search by locker number...">
+            </div>
+            <div class="detail-item">
+              <label>Key</label>
+              <input type="text" x-model="filters.Kkey" placeholder="Search by matching key...">
+            </div>
+            <div class="detail-item">
+              <label>Combination</label>
+              <input type="text" x-model="filters.Kkey" placeholder="Search by combination (e.g. 12-34-56)...">
+            </div>
+          </div>
+        </template>
       </div>
 
       <div class="modal-actions">
@@ -298,6 +512,7 @@
       </div>
     </div>
   </div>
+
   </div>
 </body>
 

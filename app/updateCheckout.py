@@ -1,42 +1,35 @@
 import sqlite3
 
-# import updateIfNotNull
+# updates only the provided fields for a specific checkout record; if a
+# parameter is None, that column in the db remains unchanged
+def updateCheckout(conn, ID, Borrower_ID=None, Item_ID=None, Checkout_Date=None, Due_Date=None, Closed_Date=None):
+    # mapping them
+    updates = {
+        "Borrower_ID": Borrower_ID,
+        "Item_ID": Item_ID,
+        "Checkout_Date": Checkout_Date,
+        "Due_Date": Due_Date,
+        "Closed_Date": Closed_Date
+    }
 
-# example call to ONLY change closed date: 
-#   updateCheckout.updateCheckout(db, 6, None, None, None, None, "4/27/27")
+    # filter out any keys where the value is None
+    to_update = {k: v for k, v in updates.items() if v is not None}
 
-# updateCheckout(ID: int, Borrower_ID: int, Item_ID: int, Checkout_Date: str, Due_Date: str, Closed_Date: str):
-# updates a checkout item record with given fields in the database
-def updateCheckout(conn: Connection, ID: int, Borrower_ID: int, Item_ID: int, Checkout_Date: str, Due_Date: str, Closed_Date: str):
-    # set cursor for db interaction
-    cur = conn.cursor()
+    if not to_update:
+        return False  # nothing to update
 
-    sID = str(ID)
-    
-    if Item_ID == None:
-        cur.execute("SELECT Item_ID FROM checkout WHERE ID = " + sID)
-        Item_ID = cur.fetchone()[0]
-    
-    if Borrower_ID == None:
-        Borrower_ID = cur.execute("SELECT Borrower_ID FROM checkout WHERE ID = " + sID).fetchone()[0]
-    
-    if Checkout_Date == None:
-        Checkout_Date = cur.execute("SELECT Checkout_Date FROM checkout WHERE ID = " + sID).fetchone()[0]
-    
-    if Due_Date == None:
-        Due_Date = cur.execute("SELECT Due_Date FROM checkout WHERE ID = " + sID).fetchone()[0]
+    # dynamically build this
+    set_clause = ", ".join([f"{column} = ?" for column in to_update.keys()])
+    params = list(to_update.values())
+    params.append(ID)
 
-    if Closed_Date == None:
-        Closed_Date = cur.execute("SELECT Closed_Date FROM checkout WHERE ID = " + sID).fetchone()[0]    
-    
-    query = "UPDATE checkout SET Borrower_ID = ?, Item_ID = ?, Checkout_Date = ?, Due_Date = ?, Closed_Date = ? WHERE ID = ?"
-    cur.execute(query, (Borrower_ID, Item_ID, Checkout_Date, Due_Date, Closed_Date, ID))
+    query = f"UPDATE checkout SET {set_clause} WHERE ID = ?"
 
-
-    # cur.execute("UPDATE checkout SET " + updateIfNotNull.uINN("Borrower_ID", Borrower_ID) + ", " + updateIfNotNull.uINN("Item_ID", Item_ID) + ", " + updateIfNotNull.uINN("Checkout_Date", Checkout_Date) + ", " + updateIfNotNull.uINN("Due_Date", Due_Date) + ", " + updateIfNotNull.uINN("Closed_Date", Closed_Date) + " WHERE ID = " + str(ID))
-
-    # commit changes to db file
-    conn.commit()
-
-    # empty table check
-    return cur.rowcount > 0
+    try:
+        cur = conn.cursor()
+        cur.execute(query, params)
+        conn.commit()
+        return cur.rowcount > 0
+    except sqlite3.Error as e:
+        print(f"SQL Error in updateCheckout: {e}")
+        return False

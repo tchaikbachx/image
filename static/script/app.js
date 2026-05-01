@@ -1,265 +1,286 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('inventory', () => ({
-        instruments: [],
-        searchQuery: '',
-        isStaff: document.body.getAttribute('data-logged-in') === 'true',        
+        // --- NAVIGATION & STATE ---
+        activeTable: 'instrument', 
+        entries: [],
+        checkoutEmail: '',
+        isStaff: document.body.getAttribute('data-logged-in') === 'true',
+        currentTab: 'details',
+        activeLoans: [],
+        history: [],
 
-        isEditMode: false,
-        isDeleteMode: false,
+        // --- UI MODALS ---
         showAddModal: false,
         showEditModal: false,
-        
-        selectedInstrument: null,
-        editTarget: {},
-        newInstrument: { 
-            Name_ID: '', 
-            Old_ID: '', 
-            Type: '', 
-            Grade: '', 
-            Make: '', 
-            Model: '', 
-            Picture: '', 
-            Serial_Number: '', 
-            Price: 0.0, 
-            Stored_In: 1, 
-            Dept: 1 
-        },
-
-        currentTab: 'details',
-
+        showEmailModal: false,
+        emailSubject: '',
+        emailBody: '',
         showAdvancedModal: false,
-
+        isEditMode: false,
+        isDeleteMode: false,
+        
+        // --- SELECTION & CRUD ---
+        selectedEntry: null,
+        searchQuery: '',
+        editTarget: {},
+        newEntry: {}, 
         filters: {
-            Name_ID: '',
-            Old_ID: '',
             Type: '',
             Grade: '',
             Make: '',
             Model: '',
             Serial_Number: '',
-            Price: 9999, // max
+            Price: 9999,
             Stored_In: '',
-            Dept: ''
+            Dept: '',
+            Status: ''
         },
 
-        checkoutEmail: '',
-        instrumentHistory: [],
-
-        // calculate the return date (arbitrarily set to 3 months for now)
-        get threeMonthsFromToday() {
-            const d = new Date();
-            d.setMonth(d.getMonth() + 3);
-            return d.toLocaleDateString();
-        },
-
-        async fetchHistory(instrumentId) {
-            try {
-                const res = await fetch(`/api/history/${instrumentId}`);
-                this.instrumentHistory = await res.json();
-            } catch (err) {
-                console.error("Failed to load history:", err);
-            }
-        },
-
-        async submitCheckout() {
-            if (!this.checkoutEmail.endsWith('@grinnell.edu')) {
-                alert("Please use a valid @grinnell.edu email.");
-                return;
-            }
-
-            const dueDate = new Date();
-            dueDate.setMonth(dueDate.getMonth() + 3);
-
-            try {
-                const res = await fetch('/api/checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: this.checkoutEmail,
-                        Item_ID: this.selectedInstrument.Name_ID,
-                        Due_Date: dueDate.toISOString().split('T')[0]
-                    })
-                });
-
-                if (res.ok) {
-                    alert("Checked out successfully!");
-                    this.checkoutEmail = '';
-                    await this.fetchInstruments(); // refresh status
-                    this.selectedInstrument = this.instruments.find(i => i.ID === this.selectedInstrument.ID);
-                    await this.fetchHistory(this.selectedInstrument.Name_ID);
-                }
-            } catch (err) {
-                alert("Checkout failed.");
-            }
-        },
-
-        async returnInstrument(instrumentId) {
-            if (!confirm(`Are you sure you want to return ${instrumentId}?`)) return;
-
-            try {
-                const response = await fetch(`/api/return/${instrumentId}`, {
-                    method: 'POST'
-                });
-
-                if (response.ok) {
-                    await this.fetchInstruments();
-                    this.selectedInstrument = null;
-                    alert("Instrument returned successfully.");
-                } else {
-                    const error = await response.json();
-                    alert("Error returning instrument: " + error.message);
-                }
-            } catch (err) {
-                console.error("Return failed:", err);
-            }
-        },
-
-        get filteredInstruments() {
-            const q = this.searchQuery.toLowerCase().trim();
+        // --- FETCHING & TABS ---
+        async init() {
+            // ensures data loads immediately for the default table
+            this.switchTable('instrument'); 
             
-            return this.instruments.filter(i => {
-                const matchesSearch = !q || (
-                    i.Name_ID?.toString().toLowerCase().includes(q) ||
-                    i.Type?.toLowerCase().includes(q) ||
-                    i.Make?.toLowerCase().includes(q) ||
-                    i.Model?.toLowerCase().includes(q)
+            // check if staff from the data-attribute set in your HTML
+            this.isStaff = document.body.getAttribute('data-logged-in') === 'true';
+        },
+
+        switchTable(tableName) {
+            this.activeTable = tableName;
+            this.searchQuery = '';
+            this.clearFilters(); 
+            this.isEditMode = false;   // reset modes on tab switch
+            this.isDeleteMode = false; // reset modes on tab switch
+            this.selectedEntry = null;
+            this.fetchEntries();
+        },
+
+        get filteredEntries() {
+            return this.entries.filter(entry => {
+                // search bar
+                const matchesSearch = !this.searchQuery || 
+                Object.values(entry).some(val => 
+                    String(val || '').toLowerCase().includes(this.searchQuery.toLowerCase())
                 );
 
-                const matchesType = !this.filters.Type || 
-                    i.Type?.toLowerCase().includes(this.filters.Type.toLowerCase().trim());
+                // adv filter
+                const matchesAdvanced = Object.keys(this.filters).every(key => {
+                const filterValue = String(this.filters[key] || '').toLowerCase();
+                const entryValue = String(entry[key] || '').toLowerCase();
 
-                const matchesGrade = !this.filters.Grade || i.Grade === this.filters.Grade;
-                const matchesMake = !this.filters.Make || i.Make?.toLowerCase().includes(this.filters.Make.toLowerCase());
-                const matchesModel = !this.filters.Model || i.Model?.toLowerCase().includes(this.filters.Model.toLowerCase());
-                const matchesSerial = !this.filters.Serial_Number || i.Serial_Number?.toString().includes(this.filters.Serial_Number);
-                
-                const maxPrice = parseFloat(this.filters.Price) || 9999;
-                const matchesPrice = (parseFloat(i.Price) || 0) <= maxPrice;
+                if (!filterValue || filterValue === '') return true;
 
-                const matchesStored = !this.filters.Stored_In || i.Stored_In?.toString() === this.filters.Stored_In.toString();
-                const matchesDept = !this.filters.Dept || i.Dept?.toString() === this.filters.Dept.toString();
+                // price
+                if (key === 'Price') return Number(entry[key] || 0) <= Number(this.filters[key]);
 
-                return matchesSearch && matchesType && matchesGrade && matchesMake && 
-                    matchesModel && matchesSerial && matchesPrice && matchesStored && matchesDept;
+                // status
+                if (key === 'Status') return String(entry.Availability || '').toLowerCase() === filterValue;
+
+                // partial matching search
+                return entryValue.includes(filterValue);
+                });
+
+                return matchesSearch && matchesAdvanced;
             });
-        },
+            },
+
 
         clearFilters() {
             this.filters = {
-                Name_ID: '', Old_ID: '', Type: '', Grade: '', Make: '', 
-                Model: '', Serial_Number: '', Price: 9999, Stored_In: '', Dept: ''
+                // shared/instruments
+                Type: '',
+                Grade: '',
+                Make: '',
+                Model: '',
+                Serial_Number: '',
+                Price: 9999,
+                Stored_In: '',
+                Dept: '',
+                Status: '',
+                // Keys
+                Description: '',
+                Qty: '',
+                // Lockers
+                Kkey: '',
+                Name_ID: ''
             };
-            this.searchQuery = '';
         },
 
-        async init() {
-            await this.fetchInstruments();
-        },
-
-        // GET the data
-        async fetchInstruments() {
+        async fetchEntries() {
             try {
-                const res = await fetch('/api/instrument');
-                this.instruments = await res.json();
+                const res = await fetch(`/api/${this.activeTable}`);
+                const data = await res.json();
+                this.entries = Array.isArray(data) ? data : []; 
             } catch (err) {
-                console.error("Failed to load instruments:", err);
+                this.entries = [];
             }
         },
 
-        // POST the data
-        async addInstrument() {
+        // --- GENERALIZED CRUD (using integer ID) ---
+        async addEntry() {
             try {
-                const res = await fetch('/api/instrument', {
+                const res = await fetch(`/api/${this.activeTable}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(this.newInstrument)
+                    body: JSON.stringify(this.newEntry)
                 });
                 if (res.ok) {
-                    await this.fetchInstruments();
+                    await this.fetchEntries();
                     this.showAddModal = false;
-                    this.resetNewInstrumentForm();
+                    this.newEntry = {};
                 }
-            } catch (err) {
-                alert("Error adding instrument to database.");
-            }
+            } catch (err) { console.error("Add failed"); }
         },
 
-        async updateInstrument() {
+        async updateEntry() {
             try {
-                const res = await fetch(`/api/instrument/${this.editTarget.ID}`, {
+                // use integer ID for URL
+                const res = await fetch(`/api/${this.activeTable}/${this.editTarget.ID}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(this.editTarget)
                 });
-                
                 if (res.ok) {
-                    await this.fetchInstruments(); // refresh
+                    await this.fetchEntries();
                     this.showEditModal = false;
                     this.isEditMode = false;
-                } else {
-                    const errorData = await res.json();
-                    console.error("Server Error:", errorData.message);
                 }
-            } catch (err) {
-                console.error("Network or Update failed:", err);
-            }
+            } catch (err) { console.error("Update failed"); }
         },
 
-        async deleteInstrument(id) {
-            if (!confirm("Are you sure you want to delete this?")) return;
+        async deleteEntry(id) {
+            if (!confirm("Are you sure?")) return;
             try {
-                const res = await fetch(`/api/instrument/${id}`, { method: 'DELETE' });
-                if (res.ok) {
-                    await this.fetchInstruments(); // refresh
-                }
-            } catch (err) {
-                alert("Delete failed.");
-            }
-        },
-
-        // UI handling -------------------------------------------------------------------------------------
-        handleCardClick(entry) {
-            if (this.isDeleteMode) {
-                this.deleteInstrument(entry.ID);
-            } else if (this.isEditMode) {
-                this.editTarget = { ...entry };
-                this.showEditModal = true;
-            } else {
-                this.selectedInstrument = entry;
-                this.currentTab = 'details';
-            }
+                // 'id' here is integer ID
+                const res = await fetch(`/api/${this.activeTable}/${id}`, { method: 'DELETE' });
+                if (res.ok) await this.fetchEntries();
+            } catch (err) { console.error("Delete failed"); }
         },
 
         toggleEditMode() {
             this.isEditMode = !this.isEditMode;
-            this.isDeleteMode = false;
-            this.selectedInstrument = null;
+            if (this.isEditMode) {
+                // reset all other modes/modals
+                this.isDeleteMode = false;
+                this.showAddModal = false;
+                this.selectedEntry = null; 
+            }
         },
 
         toggleDeleteMode() {
             this.isDeleteMode = !this.isDeleteMode;
-            this.isEditMode = false;
-            this.selectedInstrument = null;
+            if (this.isDeleteMode) {
+                // reset all other modes/modals
+                this.isEditMode = false;
+                this.showAddModal = false;
+                this.selectedEntry = null;
+            }
         },
 
-        openAddModal() {
-            this.showAddModal = true;
+        // --- UI HANDLER ---
+        async handleCardClick(entry) {
+            this.selectedEntry = entry;
+            this.currentTab = 'details';
+            
+            // only fetch sensitive tabs if user is staff
+            if (this.isStaff) {
+                if (this.isDeleteMode) {
+                    this.deleteEntry(entry.ID);
+                } else if (this.isEditMode) {
+                    this.editTarget = { ...entry };
+                    this.showEditModal = true;
+                } else {
+                    this.selectedEntry = entry;
+                    this.currentTab = 'details';
+                    this.activeLoans = []; // reset
+                    
+                    // fetch borrowers for this specific Item_ID
+                    try {
+                        const res = await fetch(`/api/checkouts/${entry.ID}`);
+                        this.activeLoans = await res.json();
+                    } catch (err) { console.error("Loan fetch failed"); }
+
+                    if (this.activeTable === 'instrument') {
+                        this.fetchHistory(entry.Name_ID);
+                    }
+                }
+            } else {
+                // clear sensitive data so it doesn't leak from a previous staff session
+                this.activeLoans = [];
+                this.history = [];
+            }
         },
 
-        resetNewInstrumentForm() {
-            this.newInstrument = { 
-                Name_ID: '', 
-                Old_ID: '', 
-                Type: '', 
-                Grade: '', 
-                Make: '', 
-                Model: '', 
-                Picture: '', 
-                Serial_Number: '', 
-                Price: 0.0, 
-                Stored_In: 1, 
-                Dept: 1 
+        async fetchHistory(nameID) {
+            try {
+                // prevents the crash
+                const res = await fetch(`/api/history/${nameID}`);
+                this.history = res.ok ? await res.json() : [];
+            } catch (err) {
+                console.error("History fetch failed:", err);
+                this.history = [];
+            }
+        },
+
+
+        submitCheckout(id, type) {
+            if (!this.checkoutEmail) {
+                alert("Please enter a borrower email.");
+                return;
+            }
+
+            const payload = {
+                item_id: id,
+                item_type: type,
+                email: this.checkoutEmail,
+                due_date: this.threeMonthsFromToday
             };
+
+            fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(async (data) => {
+                if (data.status === 'success') {
+                    // refresh the main grid to update the status (AVAILABLE -> OUT)
+                    await this.fetchEntries(); 
+                    
+                    // refresh the sidebar w/ existing /api/checkouts/ endpoint
+                    const res = await fetch(`/api/checkouts/${id}`);
+                    this.activeLoans = await res.json();
+                    
+                    // cleanup
+                    this.checkoutEmail = ''; 
+                    alert("Checkout recorded successfully!");
+                }
+            })
+            .catch(err => console.error("Checkout failed:", err));
+        },
+
+
+        async returnEntry(loanID) {
+            if(!confirm("Confirm return for this borrower?")) return;
+            try {
+                const res = await fetch(`/api/return/${loanID}`, { method: 'POST' });
+                if (res.ok) {
+                    // refresh the main grid so BOTH items turn AVAILABLE
+                    await this.fetchEntries(); 
+                    
+                    // re-fetch the whole loan list for the selected item
+                    const loanRes = await fetch(`/api/checkouts/${this.selectedEntry.ID}`);
+                    this.activeLoans = await loanRes.json();
+                    
+                    alert("Return processed successfully.");
+                }
+            } catch (err) { console.error("Return failed:", err); }
+        },
+
+        get threeMonthsFromToday() {
+            const d = new Date();
+            d.setMonth(d.getMonth() + 3);
+            return d.toISOString().split('T')[0];
         }
     }));
 });

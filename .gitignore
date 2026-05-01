@@ -1,0 +1,19 @@
+# ignore these folders:
+
+/old
+/test
+app/__pycache__*
+
+# ignore these files:
+
+conftest.py
+test.py
+check.py
+
+dep.css
+old.css
+oldapp.js
+
+requirements.txt
+server.wsgi
+Dockerfile
