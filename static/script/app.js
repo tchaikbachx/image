@@ -3,9 +3,11 @@ document.addEventListener('alpine:init', () => {
         // --- NAVIGATION & STATE ---
         activeTable: 'instrument', 
         entries: [],
+        checkoutEmail: '',
         isStaff: document.body.getAttribute('data-logged-in') === 'true',
         currentTab: 'details',
         activeLoans: [],
+        history: [],
 
         // --- UI MODALS ---
         showAddModal: false,
@@ -177,24 +179,35 @@ document.addEventListener('alpine:init', () => {
 
         // --- UI HANDLER ---
         async handleCardClick(entry) {
-            if (this.isDeleteMode) {
-                this.deleteEntry(entry.ID);
-            } else if (this.isEditMode) {
-                this.editTarget = { ...entry };
-                this.showEditModal = true;
-            } else {
-                this.selectedEntry = entry;
-                this.activeLoans = []; // reset
-                
-                // fetch borrowers for this specific Item_ID
-                try {
-                    const res = await fetch(`/api/checkouts/${entry.ID}`);
-                    this.activeLoans = await res.json();
-                } catch (err) { console.error("Loan fetch failed"); }
+            this.selectedEntry = entry;
+            this.currentTab = 'details';
+            
+            // only fetch sensitive tabs if user is staff
+            if (this.isStaff) {
+                if (this.isDeleteMode) {
+                    this.deleteEntry(entry.ID);
+                } else if (this.isEditMode) {
+                    this.editTarget = { ...entry };
+                    this.showEditModal = true;
+                } else {
+                    this.selectedEntry = entry;
+                    this.currentTab = 'details';
+                    this.activeLoans = []; // reset
+                    
+                    // fetch borrowers for this specific Item_ID
+                    try {
+                        const res = await fetch(`/api/checkouts/${entry.ID}`);
+                        this.activeLoans = await res.json();
+                    } catch (err) { console.error("Loan fetch failed"); }
 
-                if (this.activeTable === 'instrument') {
-                    this.fetchHistory(entry.Name_ID);
+                    if (this.activeTable === 'instrument') {
+                        this.fetchHistory(entry.Name_ID);
+                    }
                 }
+            } else {
+                // clear sensitive data so it doesn't leak from a previous staff session
+                this.activeLoans = [];
+                this.history = [];
             }
         },
 
@@ -209,16 +222,65 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+
+        submitCheckout(id, type) {
+            if (!this.checkoutEmail) {
+                alert("Please enter a borrower email.");
+                return;
+            }
+
+            const payload = {
+                item_id: id,
+                item_type: type,
+                email: this.checkoutEmail,
+                due_date: this.threeMonthsFromToday
+            };
+
+            fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(async (data) => {
+                if (data.status === 'success') {
+                    // refresh the main grid to update the status (AVAILABLE -> OUT)
+                    await this.fetchEntries(); 
+                    
+                    // refresh the sidebar w/ existing /api/checkouts/ endpoint
+                    const res = await fetch(`/api/checkouts/${id}`);
+                    this.activeLoans = await res.json();
+                    
+                    // cleanup
+                    this.checkoutEmail = ''; 
+                    alert("Checkout recorded successfully!");
+                }
+            })
+            .catch(err => console.error("Checkout failed:", err));
+        },
+
+
         async returnEntry(loanID) {
             if(!confirm("Confirm return for this borrower?")) return;
             try {
                 const res = await fetch(`/api/return/${loanID}`, { method: 'POST' });
                 if (res.ok) {
-                    // remove from sidebar list and refresh grid counts
-                    this.activeLoans = this.activeLoans.filter(l => l.ID !== loanID);
-                    this.fetchEntries(); 
+                    // refresh the main grid so BOTH items turn AVAILABLE
+                    await this.fetchEntries(); 
+                    
+                    // re-fetch the whole loan list for the selected item
+                    const loanRes = await fetch(`/api/checkouts/${this.selectedEntry.ID}`);
+                    this.activeLoans = await loanRes.json();
+                    
+                    alert("Return processed successfully.");
                 }
-            } catch (err) { console.error("Return failed"); }
+            } catch (err) { console.error("Return failed:", err); }
+        },
+
+        get threeMonthsFromToday() {
+            const d = new Date();
+            d.setMonth(d.getMonth() + 3);
+            return d.toISOString().split('T')[0];
         }
     }));
 });
