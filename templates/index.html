@@ -11,13 +11,15 @@
 <body class="home-page">
   <nav id="mainNav" class="navbar">
     <div class="nav-container">
-      <!-- <span class="brand">Tchaikbachx</span> -->
-      <div class="nav-links">
-        <a href="/dashboard" class="nav-link">Inventory View</a>
-        {% if session.get('is_staff') %}
-        <a href="/logout" class="nav-link logout-link">Logout</a>
-        {% endif %}
-      </div>
+      <a href="/" class="nav-link">Home</a>
+
+      <!-- Dynamic Inventory Link -->
+      {% if session.get('is_staff') %}
+      <a href="/dashboard" class="nav-link inventory-btn">View Inventory</a>
+      <a href="/logout" class="nav-link">Logout</a>
+      {% else %}
+      <a href="/inventory" class="nav-link inventory-btn">View Inventory</a>
+      {% endif %}
     </div>
   </nav>
 
@@ -31,53 +33,81 @@
 
     <div class="home-container">
       <section class="news-section">
+        <div class="news-card">
+          <div class="card-tag">Department Portal</div>
+          <h2>Policies & Information</h2>
+          <p class="lead-text">Welcome to Tchaikbachx. Use this portal to browse the Grinnell College Music Department
+            inventory and check availability.</p>
+          <!-- <hr> -->
+          <p><strong>Reminders:</strong> Please ensure all instruments are handled with care and returned by their due
+            date.</p>
+        </div>
+
         {% if session.get('is_staff') %}
         <div class="staff-welcome-card">
-          <div class="status-indicator"></div>
-          <div>
-            <h3>Staff Session Active</h3>
-            <p>Welcome back. You have full administrative access to the inventory.</p>
-            <button class="btn-primary" onclick="window.location.href='/dashboard'">Go to Staff Dashboard</button>
-          </div>
+          <!-- Staff Card Content -->
+        </div>
+        {% else %}
+        <div class="student-guide-hint">
+          <p>Need help? Visit the <strong>Utility Hub</strong> on the right for service hours and contact details.</p>
         </div>
         {% endif %}
-
-        <div class="news-card">
-          <h2>Policies & Information</h2>
-          <p>Welcome to the Tchaikbachx system. This portal allows students to browse available instruments and staff to
-            manage checkouts and inventory details.</p>
-          <hr>
-          <p><strong>End-of-semester Notice:</strong> Please ensure all instruments are returned or renewed by the end
-            of finals week.</p>
-        </div>
       </section>
 
       <aside class="sidebar">
-        <div class="info-box">
-          <h3>Service Hours</h3>
-          <ul class="hours-list">
-            <li><span>Mon - Fri</span> <span>8:00 AM - 5:00 PM</span></li>
-            <li><span>Sat - Sun</span> <span>Closed</span></li>
-          </ul>
-        </div>
+        <div class="info-box utility-hub">
+          <!-- Section 1: Service Hours -->
+          <div class="hub-section">
+            <h3>Service Hours</h3>
+            <ul class="hours-list">
+              <li><span>Mon - Fri</span> <strong>8:00 AM - 5:00 PM</strong></li>
+              <li><span>Sat - Sun</span> <strong>Closed</strong></li>
+            </ul>
+          </div>
 
-        <div class="info-box contact-box">
-          <h3>Contact</h3>
-          <p><strong>Email:</strong> music@grinnell.edu</p>
-          <p><strong>Phone:</strong> (641) 269-2222</p>
-        </div>
+          <hr class="hub-divider">
 
-        <div id="auth-controls" class="auth-box">
-          <button class="btn-view" onclick="window.location.href='/dashboard'">
-            <span></span> Browse Inventory
-          </button>
-          {% if not session.get('is_staff') %}
-          <button id="loginBtn" class="btn-login">
-            <span></span> Staff Login
-          </button>
-          {% endif %}
+          <!-- Section 2: Contact -->
+          <div class="hub-section">
+            <h3>Contact Information</h3>
+            <div class="contact-grid">
+              <p><span>Email</span><strong>music@grinnell.edu</strong></p>
+              <p><span>Phone</span><strong>(641) 269-2222</strong></p>
+            </div>
+          </div>
+
+          <!-- Section 4: Quick Links -->
+          <hr class="hub-divider">
+          <div class="hub-section">
+            <h3>Resources</h3>
+            <div class="quick-links-grid">
+              <a href="https://www.grinnell.edu/academics/majors-concentrations/music" class="quick-link-item"
+                target="_blank">
+                <span>Department Site</span>
+                <span class="link-arrow">→</span>
+              </a>
+              <!-- <a href="#" class="quick-link-item">
+                <span>Instrument Handbook</span>
+                <span class="link-arrow">→</span>
+              </a>
+              <a href="#" class="quick-link-item">
+                <span>Locker Requests</span>
+                <span class="link-arrow">→</span>
+              </a> -->
+            </div>
+          </div>
+
+          <!-- Section 5: Portal Access -->
+          <div id="auth-controls" class="auth-box hub-footer">
+            {% if not session.get('is_staff') %}
+            <button id="loginBtn" class="btn-login-minimal">
+              Staff Portal Access
+            </button>
+            {% endif %}
+          </div>
         </div>
       </aside>
+    </div>
     </div>
   </main>
 
