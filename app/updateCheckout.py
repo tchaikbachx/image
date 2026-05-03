@@ -1,17 +1,35 @@
 import sqlite3
 
-import updateIfNotNull
+# updates only the provided fields for a specific checkout record; if a
+# parameter is None, that column in the db remains unchanged
+def updateCheckout(conn, ID, Borrower_ID=None, Item_ID=None, Checkout_Date=None, Due_Date=None, Closed_Date=None):
+    # mapping them
+    updates = {
+        "Borrower_ID": Borrower_ID,
+        "Item_ID": Item_ID,
+        "Checkout_Date": Checkout_Date,
+        "Due_Date": Due_Date,
+        "Closed_Date": Closed_Date
+    }
 
-# updateCheckout(ID: int, Borrower_ID: int, Item_ID: int, Checkout_Date: str, Due_Date: str, Closed_Date: str):
-# updates a checkout item record with given fields in the database
-def updateCheckout(conn: Connection, ID: int, Borrower_ID: int, Item_ID: int, Checkout_Date: str, Due_Date: str, Closed_Date: str):
-    # set cursor for db interaction
-    cur = conn.cursor()
+    # filter out any keys where the value is None
+    to_update = {k: v for k, v in updates.items() if v is not None}
 
-    cur.execute("UPDATE checkout SET " + updateIfNotNull.uINN("Borrower_ID", Borrower_ID) + ", " + updateIfNotNull.uINN("Item_ID", Item_ID) + ", " + updateIfNotNull.uINN("Checkout_Date", Checkout_Date) + ", " + updateIfNotNull.uINN("Due_Date", Dute_Date) + ", " + updateIfNotNull.uINN("Closed_Date", Closed_Date) + " WHERE ID = " + str(ID))
+    if not to_update:
+        return False  # nothing to update
 
-    # commit changes to db file
-    conn.commit()
+    # dynamically build this
+    set_clause = ", ".join([f"{column} = ?" for column in to_update.keys()])
+    params = list(to_update.values())
+    params.append(ID)
 
-    # empty table check
-    return cur.rowcount > 0
+    query = f"UPDATE checkout SET {set_clause} WHERE ID = ?"
+
+    try:
+        cur = conn.cursor()
+        cur.execute(query, params)
+        conn.commit()
+        return cur.rowcount > 0
+    except sqlite3.Error as e:
+        print(f"SQL Error in updateCheckout: {e}")
+        return False
