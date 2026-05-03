@@ -35,7 +35,7 @@ def login(conn: Connection, username: str, pw: str):
 def changePassword(conn: Connection, username: str, pw: str, newpw: str):
     cur = conn.cursor()
 
-    if login(username, pw):
+    if login(conn, username, pw):
         newhashword = hashlib.sha256(newpw.encode("utf-8")).hexdigest()
         cur.execute("UPDATE pws SET pass = " + newhashword + " WHERE user = " + username + " AND pass = " + hashword)
         return "password change successful"
