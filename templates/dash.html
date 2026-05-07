@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!-- head information -->
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +12,12 @@
   <script src="/static/script/app.js?v=1.1"></script>
 </head>
 
+<!-- main inventory board landing page (like a giant container) -->
+
 <body x-data="inventory" data-logged-in="{{ 'true' if session.get('is_staff') else 'false' }}">
   <nav id="mainNav" class="navbar">
     <div class="nav-container">
-      <!-- visible to everyone -->
+      <!-- using Jinja2 syntax here to check for staff id -->
       <a href="/" class="nav-link">Home</a>
       {% if session.get('is_staff') %}
       <a href="/logout" class="nav-link">Logout</a>
@@ -22,8 +26,11 @@
     </div>
   </nav>
 
+  <!-- this is the larger content container -->
   <main class="content">
+    <!-- dashboard tabs containers (instrument, key, locker) -->
     <div class="dashboard-tabs">
+      <!-- find what tab we are currently in/can view based on staff id -->
       <button :class="activeTable === 'instrument' ? 'tab-active' : ''"
         @click="switchTable('instrument')">Instruments</button>
 
@@ -34,18 +41,25 @@
       {% endif %}
     </div>
 
-    <!-- <header class="dept-banner">
+    <header class="dept-banner">
       <h1>Inventory Dashboard</h1>
-    </header> -->
+    </header>
 
+    <!-- dashboard container, (contains the dashboard items) -->
     <div class="dashboard-box">
+      <!-- another inner dash container -->
       <div class="dashboard-main-content">
+        <!-- toolbar container -->
         <nav class="toolbar-container">
+          <!-- search container -->
           <div class="search-wrapper">
+            <!-- the item type is a textbox field search-->
             <input type="text" :placeholder="'Search for an item...'" x-model="searchQuery">
+            <!-- advanced search button, with the styling that marks when active -->
             <button class="btn-advanced btn-tool icon-btn"
               :class="{ 'filter-applied': Object.values(filters).some(v => v !== '' && v !== 9999) }"
               @click="showAdvancedModal = true">
+              <!-- the actual filtering call that activates filtering capability -->
               Filter <span x-show="Object.values(filters).filter(v => v !== '' && v !== 9999).length > 0"
                 x-text="'(' + Object.values(filters).filter(v => v !== '' && v !== 9999).length + ')'"></span>
             </button>
@@ -445,14 +459,14 @@
               <input type="text" x-model="filters.Serial_Number">
             </div>
 
+            <div class="detail-item admin-only">
+              <label>Storage Location (ID)</label>
+              <input type="number" x-model="filters.Stored_In">
+            </div>
+
             <div class="detail-item" style="grid-column: span 2;">
               <label>Max Price: $<span x-text="filters.Price"></span></label>
               <input type="range" min="0" max="9999" step="100" x-model="filters.Price" style="width: 100%;">
-            </div>
-
-            <div class="detail-item">
-              <label>Storage Location (ID)</label>
-              <input type="number" x-model="filters.Stored_In">
             </div>
 
             <div class="detail-item">

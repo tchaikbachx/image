@@ -776,6 +776,23 @@ body {
     100% { background-position: 0% 0%; }
 }
 
+ul {
+    list-style-type: circle;
+    /* gap: 10px; */
+    padding: 10px 10px;
+    /* margin-bottom: 10px; */
+}
+
+.info p {
+    margin-bottom: 10px;
+    padding: 10px 10px;
+}
+
+
+/* .info ul {
+    
+} */
+
 .home-page .news-card, 
 .home-page .info-box {
     background: rgba(255, 255, 255, 0.7); /* Slightly more opaque for stability */
@@ -1033,6 +1050,11 @@ body {
     align-items: flex-start;
 }
 
+.logo {
+    opacity: 100;
+    scale: 0.2;
+}
+
 .status-header {
     display: flex;
     align-items: center;
@@ -1042,6 +1064,15 @@ body {
     color: #06b6d4;
     margin-bottom: 10px;
 }
+
+/* .dept-banner h1 {
+    color: black;
+} */
+/* 
+.dept-banner {
+    opacity: 100;
+    scale: 0.25;
+} */
 
 
 .home-page .news-section {
