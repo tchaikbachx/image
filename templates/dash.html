@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- head information -->
+<!-- [FIX]: add shortcuts here so you can go directly to parts you
+            want to edit without having to scroll endlessly -->
+
+<!-- head document information -->
 
 <head>
   <meta charset="UTF-8">
@@ -15,81 +18,175 @@
 <!-- main inventory board landing page (like a giant container) -->
 
 <body x-data="inventory" data-logged-in="{{ 'true' if session.get('is_staff') else 'false' }}">
-  <nav id="mainNav" class="navbar">
+
+  <!-- DASHBOARD PAGE HEADER/BANNER -->
+  <!-- <header class="dept-banner">
+    <h1>Inventory Dashboard</h1>
+  </header> -->
+
+  <nav class="navbar">
     <div class="nav-container">
-      <!-- using Jinja2 syntax here to check for staff id -->
-      <a href="/" class="nav-link">Home</a>
-      {% if session.get('is_staff') %}
-      <a href="/logout" class="nav-link">Logout</a>
-      {% else %}
-      {% endif %}
+
+      <div class="nav-section-left">
+        <div class="nav-brand">
+          <a href="/" class="nav-link" style="margin-right: 20px;"><strong>TCHAIKBACHX</strong></a>
+        </div>
+      </div>
+
+      <div class="nav-section-center">
+        <div class="dash-tabs">
+          <button :class="activeTable === 'instrument' ? 'active' : ''"
+            @click="switchTable('instrument')">Instruments</button>
+          <button :class="activeTable === 'kkey' ? 'active' : ''" @click="switchTable('kkey')">Keys</button>
+          <button :class="activeTable === 'locker' ? 'active' : ''" @click="switchTable('locker')">Lockers</button>
+        </div>
+      </div>
+
+      <div class="nav-section-right">
+        <div class="nav-actions" style="display: flex; align-items: center; gap: 15px;">
+          <!-- 
+          <a href="/" class="nav-icon-btn" title="Home">
+            Home
+          </a> -->
+
+          <template x-if="isStaff">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <!-- <span class="staff-badge">STAFF MODE</span> -->
+              <a href="/logout" class="nav-logout-btn">Logout</a>
+            </div>
+          </template>
+
+        </div>
+      </div>
+
     </div>
   </nav>
 
-  <!-- this is the larger content container -->
-  <main class="content">
-    <!-- dashboard tabs containers (instrument, key, locker) -->
-    <div class="dashboard-tabs">
-      <!-- find what tab we are currently in/can view based on staff id -->
-      <button :class="activeTable === 'instrument' ? 'tab-active' : ''"
-        @click="switchTable('instrument')">Instruments</button>
+  <!-- <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-links-group">
+        <a href="/" class="nav-link" style="margin-right: 20px;">TCHAIKBACHX</a>
+        <div class="dash-tabs">
+          <button :class="activeTable === 'instrument' ? 'active' : ''"
+            @click="switchTable('instrument')">Instruments</button>
+          <button :class="activeTable === 'kkey' ? 'active' : ''" @click="switchTable('kkey')">Keys</button>
+          <button :class="activeTable === 'locker' ? 'active' : ''" @click="switchTable('locker')">Lockers</button>
+        </div>
+      </div>
 
-      {% if session.get('is_staff') %}
-      <button :class="activeTable === 'kkey' ? 'tab-active' : ''" @click="switchTable('kkey')">Keys</button>
-
-      <button :class="activeTable === 'locker' ? 'tab-active' : ''" @click="switchTable('locker')">Lockers</button>
-      {% endif %}
+      <div class="nav-links-group">
+        <a href="/logout" class="nav-link" style="font-size: 0.85rem; opacity: 0.6;">Logout</a>
+      </div>
     </div>
+  </nav> -->
 
-    <header class="dept-banner">
-      <h1>Inventory Dashboard</h1>
-    </header>
+  <!-- this is the larger content container -->
+  <main class="dash-content">
 
-    <!-- dashboard container, (contains the dashboard items) -->
-    <div class="dashboard-box">
-      <!-- another inner dash container -->
+    <!-- the largest dashboard container -->
+    <div class="dash-container">
+
+      <!-- another inner dashboard container (for the actual dash display) -->
       <div class="dashboard-main-content">
-        <!-- toolbar container -->
+
+        <!-- toolbar container (contains search & buttons) -->
         <nav class="toolbar-container">
-          <!-- search container -->
+
+          <!-- search container (the search and the filter button grouping) -->
           <div class="search-wrapper">
+
             <!-- the item type is a textbox field search-->
             <input type="text" :placeholder="'Search for an item...'" x-model="searchQuery">
+
             <!-- advanced search button, with the styling that marks when active -->
             <button class="btn-advanced btn-tool icon-btn"
               :class="{ 'filter-applied': Object.values(filters).some(v => v !== '' && v !== 9999) }"
               @click="showAdvancedModal = true">
-              <!-- the actual filtering call that activates filtering capability -->
-              Filter <span x-show="Object.values(filters).filter(v => v !== '' && v !== 9999).length > 0"
-                x-text="'(' + Object.values(filters).filter(v => v !== '' && v !== 9999).length + ')'"></span>
-            </button>
-          </div>
-          <div class="staff-controls" x-show="isStaff">
-            <button class="btn-tool btn-add icon-btn"
-              @click="isEditMode = false; isDeleteMode = false; newEntry = {}; showAddModal = true">
-              Add
-            </button>
-            <button class="btn-tool btn-edit icon-btn" :class="{ 'active': isEditMode }"
-              @click="toggleEditMode()">Edit</button>
-            <button class="btn-tool btn-delete icon-btn" :class="{ 'active': isDeleteMode }"
-              @click="toggleDeleteMode()">Delete</button>
-          </div>
-        </nav>
+              Filter
+              <span x-show="Object.values(filters).filter(v => v !== '' && v !== 9999).length > 0"
+                x-text="'(' + Object.values(filters).filter(v => v !== '' && v !== 9999).length + ')'">
+              </span>
+            </button> <!-- btn-advanced -->
 
+          </div> <!-- search-wrapper -->
+
+          <!-- determine if the login session is staff for setting permissions -->
+          <!-- <div class="staff-controls" x-show="isStaff"> -->
+
+
+
+          <template x-if="isStaff">
+            <div class="staff-controls" style="display: flex; gap: 12px; margin-left: auto; align-items: center;">
+
+              <!-- the add a new instrument button -->
+              <button class="btn-tool btn-add icon-btn"
+                @click="isEditMode = false; isDeleteMode = false; newEntry = {}; showAddModal = true">
+                Add
+              </button>
+
+              <!-- the edit an existing instrument button -->
+              <button class="btn-tool btn-edit icon-btn" :class="{ 'active': isEditMode }" @click="toggleEditMode()">
+                Edit
+              </button>
+
+              <!-- the delete an existing instrument button -->
+              <button class="btn-tool btn-delete icon-btn" :class="{ 'active': isDeleteMode }"
+                @click="toggleDeleteMode()">
+                Delete
+              </button>
+
+              <button @click="sendGlobalReminders()" class="btn-remind">
+                Remind All
+              </button>
+
+            </div>
+          </template>
+
+          <!-- <template x-if="isStaff">
+              <button @click="sendGlobalReminders()" style="background: red; color: white; padding: 10px;">
+                TEST: REMIND ALL
+              </button>
+            </template> -->
+
+          <!-- <template x-if="isStaff">
+              <div class="staff-actions" style="display: flex; gap: 10px; margin-left: auto;"> -->
+          <!-- <button class="btn-tool icon-btn" @click="sendGlobalReminders()" class="btn-primary"
+              style="border: 1px solid #a4d0fd; color: #1b5a99; background: #f1faff; display: flex; align-items: center; gap: 6px;">
+              Remind All
+            </button> -->
+          <!-- 
+                <button class="btn-primary" @click="showAddModal = true">+ Add Item</button>
+              </div>
+            </template> -->
+
+          <!-- </div> staff-controls -->
+        </nav> <!-- toolbar-container -->
+
+        <!-- the inner inventory container that deals with the sidebar and item layout -->
         <div class="main-inventory-layout" :class="{ 'sidebar-active': selectedEntry && !isEditMode && !isDeleteMode }">
-          <!-- GENERALIZED LIST VIEW -->
+
+          <!-- the dashboard items view (scrollable items) -->
           <div class="scroll-container">
+
+            <!-- only the item grid (ignore name, this actually applies to all tables instr/key/locker alike) -->
             <div class="instrument-grid">
+
+              <!-- individual entry listing of an item -->
               <template x-for="entry in filteredEntries" :key="entry.ID">
+
+                <!-- deals completing CRUD action on click for an item -->
                 <div class="instrument-card" :class="{ 
                   'mode-edit-active': isEditMode,
                   'mode-delete-active': isDeleteMode,
                   'selected-highlight': selectedEntry?.ID === entry.ID
                 }" @click="handleCardClick(entry)">
 
+                  <!-- display details for an item (Name_ID and Availability, they are universal) -->
                   <div class="card-horizontal-section">
                     <h3 x-text="entry.Name_ID"></h3>
                     <template x-if="entry.Availability">
+
+                      <!-- status markers to display -->
                       <div style="display: flex; flex-direction: column; align-items: flex-end;">
                         <span class="status-badge" :class="{
                           'status-in': entry.Availability === 'AVAILABLE',
@@ -97,12 +194,16 @@
                           'status-missing': entry.Availability === 'MISSING',
                           'status-broken': entry.Availability === 'BROKEN'
                       }" x-text="entry.Loan_Count > 0 ? 'OUT (' + entry.Loan_Count + ')' : entry.Availability"></span>
-                      </div>
-                    </template>
-                  </div>
+                      </div> <!-- status display block -->
 
+                    </template> <!-- Availability -->
+                  </div> <!-- card-horizontal-section -->
+
+                  <!-- INSTRUMENT SPECIFIC CARD DISPLAY -->
                   <div class="card-horizontal-data">
                     <template x-if="activeTable === 'instrument'">
+
+                      <!-- additional information to show for the instrument -->
                       <div class="instrument-grid-row">
                         <div class="grid-col"><span class="label">Type:</span><span class="value"
                             x-text="entry.Type"></span></div>
@@ -110,243 +211,365 @@
                             x-text="entry.Make"></span></div>
                         <div class="grid-col"><span class="label">Model:</span><span class="value"
                             x-text="entry.Model"></span></div>
-                      </div>
-                    </template>
+                      </div> <!-- instrument-grid-row -->
+                    </template> <!-- activeTable === instrument -->
+
+                    <!-- KEY SPECIFIC CARD DISPLAY -->
                     <template x-if="activeTable === 'kkey'">
-                      <div class="detail-item"><strong>Qty:</strong> <span x-text="entry.Qty"></span></div>
-                    </template>
+                      <div class="detail-item">
+                        <strong>Quantity:</strong>
+                        <span x-text="entry.Qty"></span>
+                      </div> <!-- detail-item -->
+                    </template> <!-- activeTable === kkey -->
+
+                    <!-- LOCKER SPECIFIC CARD DISPLAY -->
                     <template x-if="activeTable === 'locker'">
-                      <div class="detail-item"><strong>Combo:</strong> <span x-text="entry.Combo"></span></div>
-                    </template>
-                  </div>
+                      <div class="detail-item">
+                        <strong>Combo:</strong>
+                        <span x-text="entry.Combo"></span>
+                      </div> <!-- detail-item -->
+                    </template> <!-- activeTable === locker -->
 
-                  <template x-if="isStaff && isDeleteMode">
-                    <button @click.stop="deleteEntry(entry.ID)" class="btn-delete-small">🞪</button>
-                  </template>
-                </div>
-              </template>
-            </div>
-          </div>
+                  </div> <!-- card-horizontal-data -->
+                </div> <!-- CRUD instrument class -->
+              </template> <!-- filteredEntries -->
 
+            </div> <!-- instrument-grid -->
+          </div> <!-- scroll-container -->
+
+          <!-- sidebar element behavior, opens when selecting an entry -->
           <aside id="details-sidebar" x-show="selectedEntry && !isEditMode && !isDeleteMode" x-cloak
             x-transition:enter="transition-all ease-out duration-300" x-transition:enter-start="sidebar-closed"
             x-transition:enter-end="sidebar-open" x-transition:leave="transition-all ease-in duration-300"
             x-transition:leave-start="sidebar-open" x-transition:leave-end="sidebar-closed">
 
+            <!-- sidebar container -->
             <div class="sidebar-content-wrapper" x-show="selectedEntry"
               x-transition:enter="transition ease-out duration-200 delay-100" x-transition:enter-start="opacity-0"
               x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-100"
               x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
 
+              <!-- the header of the sidebar, which is the item Name_ID (or equivalent) -->
               <div class="sidebar-header">
                 <h2 x-text="selectedEntry?.Name_ID"></h2>
                 <button class="close-btn" @click="selectedEntry = null; currentTab = 'details'">&times;</button>
               </div>
 
+              <!-- the viewable tabs for the sidebar (dep. on permission) -->
               <div class="sidebar-tabs">
-                <button class="tab-btn" :class="{ 'active': currentTab === 'details' }"
-                  @click="currentTab = 'details'">Details</button>
+                <!-- DETAILS (all) -->
+                <button class="tab-btn" :class="{ 'active': currentTab === 'details' }" @click="currentTab = 'details'">
+                  Details
+                </button>
+
+                <!-- MANAGE TAB (staff) -->
                 <button class="tab-btn" x-show="isStaff" :class="{ 'active': currentTab === 'manage' }"
                   @click="currentTab = 'manage'">
                   Manage
                 </button>
+
+                <!-- HISTORY TAB (staff) -->
                 <button class="tab-btn" x-show="isStaff" :class="{ 'active': currentTab === 'history' }"
                   @click="currentTab = 'history'; if(selectedEntry) fetchHistory(selectedEntry.Name_ID)">
                   History
                 </button>
-              </div>
+              </div> <!-- sidebar-tabs -->
 
+              <!-- sidebar-body, contains the content below the header -->
               <div class="sidebar-body">
-                <!-- CATEGORY-SPECIFIC DETAILS -->
+
+                <!-- DETAILS TAB CONTENT -->
                 <div x-show="currentTab === 'details'" class="tab-content">
 
+                  <!-- INSTRUMENT TABLE -->
                   <template x-if="activeTable === 'instrument'">
                     <div class="detail-group">
-                      <div class="detail-row"><span>Current ID</span><strong x-text="selectedEntry?.Name_ID"></strong>
-                      </div>
-                      <div class="detail-row"><span>Type</span><strong x-text="selectedEntry?.Type"></strong></div>
-                      <div class=" detail-row"><span>Grade</span><strong x-text="selectedEntry?.Grade"></strong>
+
+                      <!-- current ID of the instrument -->
+                      <div class="detail-row">
+                        <span>Current ID</span>
+                        <strong x-text="selectedEntry?.Name_ID"></strong>
                       </div>
 
-                      <div class="detail-row"><span>Make</span><strong x-text="selectedEntry?.Make"></strong></div>
-                      <div class="detail-row"><span>Model</span><strong x-text="selectedEntry?.Model"></strong></div>
-                      <div class="detail-row"><span>Serial Number</span><strong
-                          x-text="selectedEntry?.Serial_Number"></strong></div>
+                      <!-- instrument type (e.g. 'Violin 1') -->
+                      <div class="detail-row">
+                        <span>Type</span>
+                        <strong x-text="selectedEntry?.Type"></strong>
+                      </div>
 
+                      <!-- instrument grade (e.g. A, B, C) -->
+                      <div class=" detail-row">
+                        <span>Grade</span>
+                        <strong x-text="selectedEntry?.Grade"></strong>
+                      </div>
+
+                      <!-- instrument make (e.g. Conn) -->
+                      <div class="detail-row">
+                        <span>Make</span>
+                        <strong x-text="selectedEntry?.Make"></strong>
+                      </div>
+
+                      <!-- instrument model (e.g. Stradivarius) -->
+                      <div class="detail-row">
+                        <span>Model</span>
+                        <strong x-text="selectedEntry?.Model"></strong>
+                      </div>
+
+                      <!-- instrument serial # (e.g. 1234567890) -->
+                      <div class="detail-row">
+                        <span>Serial Number</span>
+                        <strong x-text="selectedEntry?.Serial_Number"></strong>
+                      </div>
+
+                      <!-- STAFF-ONLY INFO -->
                       <template x-if="isStaff">
                         <div class="detail-group admin-only">
-                          <div class="detail-row"><span>Old ID</span><strong
-                              x-text="selectedEntry?.Old_ID || 'N/A'"></strong>
+
+                          <!-- instrument previous ID -->
+                          <div class="detail-row">
+                            <span>Previous ID</span>
+                            <strong x-text="selectedEntry?.Old_ID || 'N/A'"></strong>
                           </div>
+
+                          <!-- instrument price -->
                           <div class=" detail-row">
                             <span>Value</span>
                             <strong
                               x-text="selectedEntry?.Price ? '$' + Number(selectedEntry?.Price).toLocaleString() : 'N/A'"></strong>
                           </div>
+
+                          <!-- instrument location in storage -->
                           <div class="detail-row">
                             <span>Location</span>
                             <strong x-text="'Locker ' + selectedEntry?.Locker_Name || 'Unassigned'"></strong>
                           </div>
+
+                          <!-- instrument associated key (if it exists) -->
                           <div class="detail-row">
                             <span>Key</span>
                             <strong x-text="selectedEntry?.Key_Name || 'None'"></strong>
                           </div>
+
+                          <!-- instrument associated department (default 1) -->
                           <div class=" detail-row">
                             <span>Department ID</span>
                             <strong x-text="selectedEntry?.Dept"></strong>
                           </div>
-                        </div>
+
+                        </div> <!-- detail-group admin-only -->
                       </template>
-                    </div>
-                  </template>
 
+                    </div> <!-- detail-group -->
+                  </template> <!-- activeTable === instrument -->
 
+                  <!-- LOCKER TABLE -->
                   <template x-if="activeTable === 'locker'">
                     <div class="detail-group">
+
+                      <!-- the locker number -->
                       <div class="detail-row">
                         <span>Locker Number</span>
                         <strong x-text="selectedEntry?.Name_ID"></strong>
                       </div>
+
+                      <!-- the combination (if it exists) -->
                       <div class="detail-row">
                         <span>Combination</span>
                         <strong x-text="selectedEntry?.Combo"></strong>
                       </div>
+
+                      <!-- the associated key (if it exists) -->
                       <div class="detail-row">
                         <span>Key Required</span>
                         <strong x-text="selectedEntry?.Key_Name || selectedEntry?.Kkey || 'None'"></strong>
                       </div>
-                    </div>
-                    <div class="detail-item">
-                      <strong>Checkoutable?</strong>
-                      <select x-model="editTarget.Checkoutable">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                      </select>
-                    </div>
-                  </template>
 
-                  <template x-if="activeTable === 'kkey'">
-                    <div class="detail-group">
-                      <div class="detail-row">
-                        <span>Key Number</span>
-                        <strong x-text="selectedEntry?.Name_ID"></strong>
+                      <!-- checkoutable status -->
+                      <div class="detail-item">
+                        <strong>Checkoutable?</strong>
+                        <select x-model="editTarget.Checkoutable">
+                          <option value="1">Yes</option>
+                          <option value="0">No</option>
+                        </select>
                       </div>
-                      <div class="detail-row">
-                        <span>Quantity</span>
-                        <strong x-text="selectedEntry?.Qty"></strong>
-                      </div>
-                      <div class="detail-row">
-                        <span>Description</span>
-                        <strong x-text="selectedEntry?.Description"></strong>
-                      </div>
-                    </div>
-                  </template>
-                </div>
 
-                <div id="manage-content" class="tab-pane" x-show="currentTab === 'manage'">
-                  <div class="checkout-ui">
-                    <h3>New Checkout</h3>
+                  </template> <!-- activeTable === locker -->
+                </div> <!-- currentTab === details -->
+              </div> <!-- detail-group -->
 
-                    <div class="date-hint">
-                      <span>This item will be due on</span>
-                      <strong x-text="threeMonthsFromToday"></strong>
-                    </div>
+              <!-- KEY TABLE -->
+              <template x-if="activeTable === 'kkey'">
+                <div class="detail-group">
 
-                    <div class="checkout-input-group">
-                      <label>Borrower Email</label>
-                      <input type="email" x-model="checkoutEmail" placeholder="name@grinnell.edu"
-                        @keyup.enter="submitCheckout(selectedEntry.ID, activeTable)">
-                    </div>
-
-                    <button class="btn-primary sleek-btn" @click="submitCheckout(selectedEntry.ID, activeTable)">
-                      <span>Complete Checkout</span>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12h14m-7-7 7 7-7 7" />
-                      </svg>
-                    </button>
+                  <!-- the key's number/ID -->
+                  <div class="detail-row">
+                    <span>Key Number</span>
+                    <strong x-text="selectedEntry?.Name_ID"></strong>
                   </div>
 
-                  <div class="active-loans-list" style="margin-top: 24px;">
-                    <h4>Current Borrowers</h4>
-                    <div class="loan-container">
-                      <template x-for="loan in activeLoans" :key="loan.ID">
-                        <div class="loan-row">
-                          <div class="loan-details">
-                            <div class="loan-info-main" x-text="loan.Email"></div>
-                            <div class="loan-info-sub">
-                              <span>
-                                <span class="date-label">Out:</span>
-                                <span x-text="loan.Checkout_Date || 'N/A'"></span>
-                              </span>
-                              <span>
-                                <span class="date-label">Due:</span>
-                                <span x-text="loan.Due_Date"></span>
-                              </span>
-                            </div>
-                          </div>
-                          <button class="btn-return-action" @click="returnEntry(loan.ID)">
-                            RETURN
-                          </button>
-                        </div>
-                      </template>
-
-                      <template x-if="activeLoans.length === 0">
-                        <div
-                          style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.8rem; border: 1px dashed var(--border); border-radius: 8px;">
-                          No active loans.
-                        </div>
-                      </template>
-                    </div>
+                  <!-- the quantity keys with the same ID -->
+                  <div class="detail-row">
+                    <span>Quantity</span>
+                    <strong x-text="selectedEntry?.Qty"></strong>
                   </div>
+
+                  <!-- key description (if applicable) -->
+                  <div class="detail-row">
+                    <span>Description</span>
+                    <strong x-text="selectedEntry?.Description"></strong>
+                  </div>
+
+                </div> <!-- detail-group -->
+              </template> <!-- activeTable === kkey -->
+            </div> <!-- sidebar-content-wrapper -->
+
+            <!-- MANAGE TAB CONTENT -->
+            <div id="manage-content" class="tab-pane" x-show="currentTab === 'manage'"
+              style="padding: 20px; margin-top: 0; position: sticky;">
+
+              <!-- checkout container -->
+              <div class="checkout-ui">
+                <h3>New Checkout</h3>
+
+                <!-- auto-populate date for return (can be edited) -->
+                <div class="date-hint">
+                  <span>This item will be due on</span>
+                  <input type="date" x-model="manualDueDate" class="date-picker">
+                  <!-- <strong x-text="threeMonthsFromToday"></strong> -->
                 </div>
 
-
-                <div x-show="currentTab === 'history'" class="tab-content">
-                  <!-- history list rendering needs to be put here -->
+                <!-- fill-in bar for the new borrower -->
+                <div class="checkout-input-group">
+                  <label>Borrower Email</label>
+                  <input type="email" x-model="checkoutEmail" placeholder="name@grinnell.edu"
+                    @keyup.enter="submitCheckout(selectedEntry.ID, activeTable)">
                 </div>
 
-              </div>
+                <!-- the big checkout button -->
+                <button class="btn-primary sleek-btn" @click="submitCheckout(selectedEntry.ID, activeTable)">
+                  <span>Complete Checkout</span>
 
-            </div>
+                  <!-- ICON (arrow) -->
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14m-7-7 7 7-7 7" />
+                  </svg>
+                </button> <!-- btn-primary sleek-btn -->
+              </div> <!-- checkout-ui -->
 
-        </div>
-      </div>
-  </main>
+              <!-- active borrowers list -->
+              <div class="active-loans-list" style="margin-top: 24px;">
+                <h4>Current Borrowers</h4>
 
+                <!-- checked-out items container (multiple) -->
+                <div class="loan-container">
+                  <template x-for="loan in activeLoans" :key="loan.ID">
+
+                    <!-- checked-out item container (singular) -->
+                    <div class="loan-row">
+
+                      <!-- details of the borrower's loan duration -->
+                      <div class="loan-details">
+
+                        <div class="loan-info-sub">
+                          <!-- borrower checkout date -->
+                          <span>
+                            <span class="date-label">Out:</span>
+                            <span x-text="loan.Checkout_Date || 'N/A'"></span>
+                          </span>
+
+                          <!-- borrower return by date -->
+                          <span>
+                            <span class="date-label">Due:</span>
+                            <span x-text="loan.Due_Date"></span>
+                          </span>
+                        </div> <!-- loan-info-sub -->
+                      </div> <!-- loan-details -->
+
+                      <!-- return the checked out item -->
+                      <button class="btn-return-action" @click="returnEntry(loan.ID)">
+                        RETURN
+                      </button>
+
+                    </div> <!-- loan-row -->
+                  </template> <!-- activeLoans -->
+
+                  <!-- loan guard if none -->
+                  <template x-if="activeLoans.length === 0">
+                    <div
+                      style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.8rem; border: 1px dashed var(--border); border-radius: 8px;">
+                      No active loans.
+                    </div>
+                  </template> <!-- !activeLoans -->
+
+                </div> <!-- loan-container -->
+              </div> <!-- active-loans-list -->
+            </div> <!-- manage-content -->
+
+            <!-- HISTORY TAB -->
+            <div x-show="currentTab === 'history'" class="tab-content">
+              <!-- TODO: FILL THIS IN -->
+            </div> <!-- currentTab === history -->
+          </aside>
+
+        </div> <!-- main-inventory-layout -->
+      </div> <!-- dashboard-main-content -->
+    </div> <!-- dash-container -->
+  </main> <!-- dash-content -->
+
+  <!-- EMAIL MODAL -->
   <div class="modal" :class="{ 'active': showEmailModal }" x-show="showEmailModal" x-cloak>
+
+    <!-- modal body content -->
     <div class="modal-content">
       <h2>Confirm Checkout Email</h2>
+
+      <!-- email subject -->
       <div class="input-group">
         <label>Subject</label>
         <input type="text" x-model="emailSubject">
       </div>
+
+      <!-- email body (pre-generated, but editable) -->
       <div class="input-group">
         <label>Message Body</label>
         <textarea x-model="emailBody" style="width: 100%; height: 150px; border-radius: 6px; padding: 10px;"></textarea>
       </div>
+
+      <!-- email client note -->
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
         Clicking confirm will open your email client and update the database.
       </p>
+
+      <!-- email buttons -->
       <div class="modal-actions">
         <button class="btn-secondary" @click="showEmailModal = false">Cancel</button>
         <button class="btn-primary" @click="finalizeCheckout()">Confirm & Send</button>
       </div>
-    </div>
-  </div>
 
+    </div> <!-- modal-content -->
+  </div> <!-- showEmailModal -->
+
+
+  <!-- ADD MODAL -->
   <div class="modal" :class="{ 'active': showAddModal }" x-show="showAddModal">
-    <div class="modal-content">
-      <h2 x-text="'Add New ' + activeTable"></h2>
 
+    <!-- modal body content -->
+    <div class="modal-content">
+      <h2>Add New Item</h2>
+
+      <!-- new item details container -->
       <div class="details-grid">
         <div class="detail-item">
-          <label>Identifier (Name_ID)</label>
-          <input type="text" :placeholder="activeTable === 'locker' ? 'Locker #' : 'Name/ID'"
-            x-model="newEntry.Name_ID">
-        </div>
 
+          <!-- header for the new item to add -->
+          <label>Item</label>
+          <input type="text" :placeholder="activeTable === 'locker' ? 'Locker #' : 'Name'" x-model="newEntry.Name_ID">
+        </div> <!-- detail-item -->
+
+        <!-- NEW INSTRUMENT -->
         <template x-if="activeTable === 'instrument'">
+          <!-- [FIX] detail fields to fill (Type, Make, Model, Serial Number) -->
           <div style="display: contents;">
             <div class="grid-pair">
               <input type="text" placeholder="Type" x-model="newEntry.Type">
@@ -354,86 +577,112 @@
             </div>
             <input type="text" placeholder="Model" x-model="newEntry.Model">
             <input type="text" placeholder="Serial Number" x-model="newEntry.Serial_Number">
-          </div>
-        </template>
+            <input type="text" placeholder="Model" x-model="newEntry.Price">
+          </div> <!-- display -->
+        </template> <!-- activeTable === instrument -->
 
+        <!-- NEW KEY -->
         <template x-if="activeTable === 'kkey'">
+          <!-- detail fields to fill (Qty, Description) -->
           <div style="display: contents;">
             <input type="number" placeholder="Total Quantity" x-model="newEntry.Qty">
             <input type="text" placeholder="Key Description" x-model="newEntry.Description">
-          </div>
-        </template>
+          </div> <!-- display -->
+        </template> <!-- activeTable === kkey -->
 
+        <!-- NEW LOCKER -->
         <template x-if="activeTable === 'locker'">
+          <!-- detail fields to fill (Combo, Kkey, Checkoutable) -->
           <div style="display: contents;">
             <input type="text" placeholder="Combination (XX-XX-XX)" x-model="newEntry.Combo">
             <input type="text" placeholder="Key Code" x-model="newEntry.Kkey">
             <input type="hidden" x-init="newEntry.Checkoutable = 1">
-          </div>
-        </template>
-      </div>
+          </div> <!-- display -->
+        </template> <!-- activeTable === locker -->
+      </div> <!-- detail-grid -->
 
 
+      <!-- MODAL BUTTON ACTIONS (CANCEL/CONFIRM) -->
       <div class="modal-actions">
-        <button class="btn-secondary" @click="showAddModal = false">Cancel</button>
-        <button class="btn-primary" @click="addEntry()">Confirm</button>
-      </div>
-    </div>
-  </div>
+        <button class="btn-secondary" @click="showAddModal = false">
+          Cancel
+        </button>
+        <button class="btn-primary" @click="addEntry()">
+          Confirm
+        </button>
+      </div> <!-- modal-actions -->
 
+    </div> <!-- modal-content -->
+  </div> <!-- showAddModal -->
+
+
+  <!-- EDIT MODAL -->
   <div class="modal" :class="{ 'active': showEditModal }" x-show="showEditModal" x-cloak>
     <div class="modal-content">
-      <!-- Dynamic Header -->
-      <h2>Update <span x-text="activeTable"></span>: <span x-text="editTarget.Name_ID"></span></h2>
+      <!-- [FIX] dynamic header that matches the current table -->
+      <h2>Update
+        <span x-text="activeTable"></span>:
+        <span x-text="editTarget.Name_ID"></span>
+      </h2>
 
       <div class="details-grid">
-        <!-- Instrument Fields -->
+
+        <!-- INSTRUMENT FIELDS -->
         <template x-if="activeTable === 'instrument'">
           <div style="display: contents;">
             <div class="detail-item"><strong>Type</strong><input type="text" x-model="editTarget.Type"></div>
             <div class="detail-item"><strong>Make</strong><input type="text" x-model="editTarget.Make"></div>
             <div class="detail-item"><strong>Model</strong><input type="text" x-model="editTarget.Model"></div>
-          </div>
-        </template>
+          </div> <!-- display -->
+        </template> <!-- activeTable === instrument -->
 
-        <!-- Key Fields -->
+        <!-- KEY FIELDS -->
         <template x-if="activeTable === 'kkey'">
           <div style="display: contents;">
             <div class="detail-item"><strong>Quantity</strong><input type="number" x-model="editTarget.Qty"></div>
             <div class="detail-item"><strong>Description</strong><input type="text" x-model="editTarget.Description">
             </div>
-          </div>
-        </template>
+          </div> <!-- display -->
+        </template> <!-- activeTable === kkey -->
 
-        <!-- Locker Fields -->
+        <!-- LOCKER FIELDS -->
         <template x-if="activeTable === 'locker'">
           <div style="display: contents;">
             <div class="detail-item"><strong>Combo</strong><input type="text" x-model="editTarget.Combo"></div>
             <div class="detail-item"><strong>Key Code</strong><input type="text" x-model="editTarget.Kkey"></div>
-          </div>
-        </template>
-      </div>
+          </div> <!-- display -->
+        </template> <!-- activeTable === locker -->
+      </div> <!-- details-grid -->
 
+      <!-- CANCEL/CONFIRM -->
       <div class="modal-actions">
         <button class="btn-secondary" @click="showEditModal = false">Cancel</button>
         <button class="btn-primary" @click="updateEntry()">Confirm</button>
-      </div>
-    </div>
-  </div>
+      </div> <!-- modal-actions -->
+    </div> <!-- modal-content -->
+  </div> <!-- modal -->
 
+
+  <!-- ADVANCED FILTERING MODAL -->
   <div class="modal" :class="{ 'active': showAdvancedModal }" x-show="showAdvancedModal" x-cloak>
     <div class="modal-content" style="width: 700px; max-height: 90vh; overflow-y: auto;">
+
+      <!-- set the button that triggers the filter modal -->
       <button class="close-btn" @click="showAdvancedModal = false">&times;</button>
       <h2>Advanced Search</h2>
-
       <div class="details-grid">
+
         <!-- INSTRUMENT SPECIFIC FILTERS -->
         <template x-if="activeTable === 'instrument'">
           <div style="display: contents;">
+
+            <!-- type field (input) -->
             <div class="detail-item">
               <label>Type</label>
               <input type="text" x-model="filters.Type">
-            </div>
+            </div> <!-- detail-item -->
+
+            <!-- grade field (dropdown) -->
             <div class="detail-item">
               <label>Grade</label>
               <select x-model="filters.Grade">
@@ -441,93 +690,113 @@
                 <option value="A">Grade A</option>
                 <option value="B">Grade B</option>
                 <option value="C">Grade C</option>
-              </select>
-            </div>
+              </select> <!-- Grade -->
+            </div> <!-- detail-item -->
 
+            <!-- make field (input) -->
             <div class="detail-item">
               <label>Make</label>
               <input type="text" x-model="filters.Make">
-            </div>
+            </div> <!-- detail-item -->
 
+            <!-- model field (input) -->
             <div class="detail-item">
               <label>Model</label>
               <input type="text" x-model="filters.Model">
-            </div>
+            </div> <!-- detail-item -->
 
+            <!-- serial # field (input) -->
             <div class="detail-item">
               <label>Serial Number</label>
               <input type="text" x-model="filters.Serial_Number">
-            </div>
+            </div> <!-- detail-item -->
 
+            <!-- location field (number) -->
             <div class="detail-item admin-only">
-              <label>Storage Location (ID)</label>
+              <label>Location/Storage</label>
               <input type="number" x-model="filters.Stored_In">
-            </div>
+            </div> <!-- detail-item -->
 
+            <!-- price field (range/interactable) -->
             <div class="detail-item" style="grid-column: span 2;">
               <label>Max Price: $<span x-text="filters.Price"></span></label>
               <input type="range" min="0" max="9999" step="100" x-model="filters.Price" style="width: 100%;">
-            </div>
+            </div> <!-- detail-item -->
 
+            <!-- department field (number) -->
             <div class="detail-item">
-              <label>Department (ID)</label>
+              <label>Department</label>
               <input type="number" x-model="filters.Dept">
-            </div>
+            </div> <!-- detail-item -->
 
+            <!-- status field (dropdown) -->
             <div class="detail-item">
-              <label>Condition</label>
+              <label>Status</label>
               <select x-model="filters.Status">
                 <option value="">All Items</option>
                 <option value="IN">In Stock</option>
                 <option value="OUT">Checked Out</option>
                 <option value="BROKEN">Broken/Repair</option>
                 <option value="MISSING">Missing</option>
-              </select>
-            </div>
-          </div>
-        </template>
+              </select> <!-- Status -->
+            </div> <!-- detail-item -->
+          </div> <!-- display -->
+        </template> <!-- activeTable === instrument -->
+
 
         <!-- KEY SPECIFIC FILTERS -->
         <template x-if="activeTable === 'kkey'">
           <div style="display: contents;">
+
+            <!-- key # field (input) -->
             <div class="detail-item">
               <label>Key Number</label>
               <input type="text" x-model="filters.Name_ID" placeholder="Search by key number...">
-            </div>
+            </div> <!-- detail-item  -->
+
+            <!-- quantity field (number) -->
             <div class="detail-item">
               <label>Quantity</label>
               <input type="number" x-model="filters.Qty" placeholder="Search by numerical copies...">
-            </div>
-          </div>
-        </template>
+            </div> <!-- detail-item -->
+          </div> <!-- display -->
+        </template> <!-- activeTable === kkey -->
+
 
         <!-- LOCKER SPECIFIC FILTERS -->
         <template x-if="activeTable === 'locker'">
           <div style="display: contents;">
+
+            <!-- locker # field (input) -->
             <div class="detail-item">
               <label>Locker</label>
               <input type="text" x-model="filters.Name_ID" placeholder="Search by locker number...">
-            </div>
+            </div> <!-- detail-item -->
+
+            <!-- locker key (input) -->
             <div class="detail-item">
               <label>Key</label>
               <input type="text" x-model="filters.Kkey" placeholder="Search by matching key...">
-            </div>
+            </div> <!-- detail-item -->
+
+            <!-- locker combination (input) -->
             <div class="detail-item">
               <label>Combination</label>
               <input type="text" x-model="filters.Kkey" placeholder="Search by combination (e.g. 12-34-56)...">
-            </div>
-          </div>
-        </template>
-      </div>
+            </div> <!-- detail-item -->
+          </div> <!-- display -->
 
+        </template> <!-- activeTable === locker -->
+      </div> <!-- details-grid -->
+
+      <!-- RESET/RESULTS -->
       <div class="modal-actions">
         <button class="btn-secondary" @click="clearFilters()">Reset All</button>
         <button class="btn-primary" @click="showAdvancedModal = false">Show Results</button>
-      </div>
-    </div>
-  </div>
+      </div> <!-- modal-actions -->
+    </div> <!-- modal-content -->
+  </div> <!-- modal -->
 
-  </div>
 </body>
 
 </html>

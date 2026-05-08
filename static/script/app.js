@@ -181,6 +181,7 @@ document.addEventListener('alpine:init', () => {
         async handleCardClick(entry) {
             this.selectedEntry = entry;
             this.currentTab = 'details';
+            this.manualDueDate = this.dueDate();
             
             // only fetch sensitive tabs if user is staff
             if (this.isStaff) {
@@ -222,6 +223,14 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        sendIndividualConfirmation(item, email, date) {
+            const subject = encodeURIComponent(`Checkout Confirmation: ${item.Make} ${item.Model}`);
+            const body = encodeURIComponent(
+                `Hi,\n\nYou have checked out ${item.Name_ID}.\n\nReturn Deadline: ${date}\n\nThanks!`
+            );
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        },
+
 
         submitCheckout(id, type) {
             if (!this.checkoutEmail) {
@@ -233,8 +242,11 @@ document.addEventListener('alpine:init', () => {
                 item_id: id,
                 item_type: type,
                 email: this.checkoutEmail,
-                due_date: this.threeMonthsFromToday
+                due_date: this.manualDueDate
             };
+
+            const targetEmail = this.checkoutEmail;
+            const finalDate = this.manualDueDate;
 
             fetch('/api/checkout', {
                 method: 'POST',
@@ -246,14 +258,13 @@ document.addEventListener('alpine:init', () => {
                 if (data.status === 'success') {
                     // refresh the main grid to update the status (AVAILABLE -> OUT)
                     await this.fetchEntries(); 
-                    
                     // refresh the sidebar w/ existing /api/checkouts/ endpoint
                     const res = await fetch(`/api/checkouts/${id}`);
                     this.activeLoans = await res.json();
                     
-                    // cleanup
+                    this.sendIndividualConfirmation(this.selectedEntry, targetEmail, finalDate);
                     this.checkoutEmail = ''; 
-                    alert("Checkout recorded successfully!");
+                    alert("Checkout recorded! Opening email confirmation draft...");
                 }
             })
             .catch(err => console.error("Checkout failed:", err));
@@ -277,10 +288,48 @@ document.addEventListener('alpine:init', () => {
             } catch (err) { console.error("Return failed:", err); }
         },
 
-        get threeMonthsFromToday() {
-            const d = new Date();
-            d.setMonth(d.getMonth() + 3);
-            return d.toISOString().split('T')[0];
+        manualDueDate: '',
+
+        dueDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            let targetMonth = (month >= 0 && month <= 4) ? 4 : 11;
+            
+            const getSecondFriday = (y, m) => {
+                let count = 0;
+                let d = new Date(y, m, 1);
+                while (count < 2) {
+                    if (d.getDay() === 5) count++;
+                    if (count < 2) d.setDate(d.getDate() + 1);
+                }
+                return d.toISOString().split('T')[0];
+            };
+
+            return getSecondFriday(year, targetMonth);
+        },
+
+
+        async sendGlobalReminders() {
+            const confirmed = confirm("Generate an email list for all students with active checkouts?");
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch('/api/checkouts/active_emails');
+                const data = await response.json();
+                
+                if (data.emails) {
+                    const subject = encodeURIComponent("Music Department: Instrument Return Deadline");
+                    const body = encodeURIComponent(
+                        "Hello Musicians,\n\nThis is a friendly reminder that you currently have an active checkout from the Music Department. All checked-out music equipment must be returned before the start of finals week. Please visit the checkout desk to return your items or if you have any questions regarding returns.\n\nThank you!"
+                    );
+                    
+                    window.location.href = `mailto:?bcc=${data.emails}&subject=${subject}&body=${body}`;
+                }
+            } catch (e) {
+                console.error("Communication error:", e);
+            }
         }
     }));
 });

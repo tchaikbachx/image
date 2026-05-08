@@ -9,19 +9,55 @@
 </head>
 
 <body class="home-page">
-  <nav id="mainNav" class="navbar">
+  <nav class="navbar">
     <div class="nav-container">
-      <a href="/" class="nav-link">Home</a>
 
-      <!-- Dynamic Inventory Link -->
-      {% if session.get('is_staff') %}
-      <a href="/dashboard" class="nav-link inventory-btn">View Inventory</a>
-      <a href="/logout" class="nav-link">Logout</a>
-      {% else %}
-      <a href="/inventory" class="nav-link inventory-btn">View Inventory</a>
-      {% endif %}
+      <div class="nav-section-left">
+        <div class="nav-brand">
+          <a href="/" class="nav-link" style="margin-right: 20px;"><strong>TCHAIKBACHX</strong></a>
+        </div>
+      </div>
+
+      <!-- <div class="nav-section-left">
+        <a href="/" class="nav-link logo-text">TCHAIKBACHX</a>
+      </div> -->
+
+      <div class="nav-section-center">
+      </div>
+
+      <div class="nav-section-right">
+        <div class="nav-links-group">
+          <!-- <a href="/" class="nav-link">Home</a> -->
+
+          {% if session.get('is_staff') %}
+          <a href="/dashboard" class="nav-link inventory-btn">Manage Inventory</a>
+          <a href="/logout" class="nav-link logout-small">Logout</a>
+          {% else %}
+          <a href="/dashboard" class="nav-link">View Inventory</a>
+          <button id="loginBtn" class="nav-link login-small">Staff Login</button>
+          {% endif %}
+        </div>
+      </div>
+
     </div>
   </nav>
+  <!-- <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-link" style="font-size: 1.2rem; letter-spacing: 1px;">TCHAIKBACHX</a>
+
+      <div class="nav-links-group">
+        <a href="/" class="nav-link">Home</a>
+        {% if session.get('is_staff') %}
+        <a href="/dashboard" class="nav-link inventory-btn">Manage Inventory</a>
+        <a href="/logout" class="nav-link" style="font-size: 0.85rem; opacity: 0.6;">Logout</a>
+        {% else %}
+        <a href="/dashboard" class="nav-link">View Inventory</a>
+        <button id="loginBtn" class="nav-link"
+          style="background:none; border:none; cursor:pointer; font-size: 0.85rem; opacity: 0.6;">Staff Login</button>
+        {% endif %}
+      </div>
+    </div>
+  </nav> -->
 
   <main class="content">
     <header class="dept-banner">
@@ -34,7 +70,7 @@
       </div>
     </header>
 
-    <img src="checkout.png" alt="A map to find the music checkout area.">
+    <!-- <img src="checkout.png" alt="A map to find the music checkout area."> -->
 
     <div class="home-container">
       <section class="news-section">
@@ -174,7 +210,7 @@
 
               <a href="https://grinco.sharepoint.com/sites/Music/SitePages/Inst.aspx" class="quick-link-item"
                 target="_blank">
-                <span>Go to Sharepoint</span>
+                <span>Sharepoint</span>
                 <span class="link-arrow">→</span>
               </a>
 
@@ -204,6 +240,40 @@
   </main>
 
   <div id="loginModal" class="modal">
+    <div class="modal-content login-box">
+      <span id="closeModal" class="close-btn">&times;</span>
+
+      <div class="login-header">
+        <h2>Staff Portal</h2>
+        <p>Please enter your administrative credentials.</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="e.g. p-curry" required>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+
+        <div id="loginError" class="error-text">Invalid username or password.</div>
+
+        <button type="submit" class="btn-primary login-submit">Sign In</button>
+
+        <div class="login-footer">
+          <button type="button" class="btn-link"
+            onclick="alert('Please contact the Music Department IT head to reset your password.')">
+            Forgot or Change Password?
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- <div id="loginModal" class="modal">
     <div class="modal-content auth-modal">
       <button class="close-btn" id="closeModal">&times;</button>
       <h2>Staff Portal</h2>
@@ -220,7 +290,7 @@
         <button type="submit" class="btn-primary">Login</button>
       </form>
     </div>
-  </div>
+  </div> -->
 
   <script>
     const loginModal = document.getElementById('loginModal');
