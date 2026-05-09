@@ -12,6 +12,8 @@ import addLocker
 # import addMissing
 import emptyTrash
 import deleteEntry
+# import getBorrowerHistory
+import getItemHistory
 
 from flask import Flask
 
@@ -45,6 +47,9 @@ def initTables():
 
 # initialize tables
 initTables()
+
+
+
 
 # this function is causing error and i cannot figure out why. things are falling apart and making me sad. this is a disaster
 # addLocker.addLocker(db, "lockertodelete", None, 0, True)

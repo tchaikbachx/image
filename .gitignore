@@ -1,8 +1,7 @@
 # ignore these folders:
 
-/old
-/test
 app/__pycache__*
+/IGNORE
 
 # ignore these files:
 

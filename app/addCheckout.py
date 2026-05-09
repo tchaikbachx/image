@@ -1,5 +1,8 @@
 import sqlite3
 
+
+# checkout date is handled on the front end 
+# the item type is handled on the front end (3 options: "instrument", "locker", "kkey")
 # add a checkout to the table and update the history accordingly.
 def addCheckout(conn, Item_ID, Borrower_ID, Due_Date):
     cur = conn.cursor()
