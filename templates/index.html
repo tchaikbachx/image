@@ -9,49 +9,154 @@
 </head>
 
 <body class="home-page">
-  <nav id="mainNav" class="navbar">
+  <nav class="navbar">
     <div class="nav-container">
-      <a href="/" class="nav-link">Home</a>
 
-      <!-- Dynamic Inventory Link -->
-      {% if session.get('is_staff') %}
-      <a href="/dashboard" class="nav-link inventory-btn">View Inventory</a>
-      <a href="/logout" class="nav-link">Logout</a>
-      {% else %}
-      <a href="/inventory" class="nav-link inventory-btn">View Inventory</a>
-      {% endif %}
+      <div class="nav-section-left">
+        <div class="nav-brand">
+          <a href="/" class="nav-link" style="margin-right: 20px;"><strong>TCHAIKBACHX</strong></a>
+        </div>
+      </div>
+
+      <!-- <div class="nav-section-left">
+        <a href="/" class="nav-link logo-text">TCHAIKBACHX</a>
+      </div> -->
+
+      <div class="nav-section-center">
+      </div>
+
+      <div class="nav-section-right">
+        <div class="nav-links-group">
+          <!-- <a href="/" class="nav-link">Home</a> -->
+
+          {% if session.get('is_staff') %}
+          <a href="/dashboard" class="nav-link inventory-btn">Manage Inventory</a>
+          <a href="/logout" class="nav-link logout-small">Logout</a>
+          {% else %}
+          <a href="/dashboard" class="nav-link">View Inventory</a>
+          <button id="loginBtn" class="nav-link login-small">Staff Login</button>
+          {% endif %}
+        </div>
+      </div>
+
     </div>
   </nav>
+  <!-- <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-link" style="font-size: 1.2rem; letter-spacing: 1px;">TCHAIKBACHX</a>
+
+      <div class="nav-links-group">
+        <a href="/" class="nav-link">Home</a>
+        {% if session.get('is_staff') %}
+        <a href="/dashboard" class="nav-link inventory-btn">Manage Inventory</a>
+        <a href="/logout" class="nav-link" style="font-size: 0.85rem; opacity: 0.6;">Logout</a>
+        {% else %}
+        <a href="/dashboard" class="nav-link">View Inventory</a>
+        <button id="loginBtn" class="nav-link"
+          style="background:none; border:none; cursor:pointer; font-size: 0.85rem; opacity: 0.6;">Staff Login</button>
+        {% endif %}
+      </div>
+    </div>
+  </nav> -->
 
   <main class="content">
     <header class="dept-banner">
+      <div class="logo">
+
+      </div>
       <div class="banner-overlay">
         <h1>Grinnell College Music Department</h1>
         <p>Instrument Inventory & Management System</p>
       </div>
     </header>
 
+    <!-- <img src="checkout.png" alt="A map to find the music checkout area."> -->
+
     <div class="home-container">
       <section class="news-section">
         <div class="news-card">
-          <div class="card-tag">Department Portal</div>
           <h2>Policies & Information</h2>
-          <p class="lead-text">Welcome to Tchaikbachx. Use this portal to browse the Grinnell College Music Department
-            inventory and check availability.</p>
-          <!-- <hr> -->
-          <p><strong>Reminders:</strong> Please ensure all instruments are handled with care and returned by their due
-            date.</p>
-        </div>
 
-        {% if session.get('is_staff') %}
-        <div class="staff-welcome-card">
-          <!-- Staff Card Content -->
-        </div>
-        {% else %}
-        <div class="student-guide-hint">
-          <p>Need help? Visit the <strong>Utility Hub</strong> on the right for service hours and contact details.</p>
-        </div>
-        {% endif %}
+          <p>Welcome to the Tchaikbachx system. This portal allows students to browse available instruments and staff to
+            manage checkouts and inventory details. Checking out an instrument is a privilege and responsibility. Our
+            instrument collection is prioritized for Music Department activities. We have a limited number of
+            instruments, and students will likely have to share for the semester. Following these guidelines helps
+            ensure access to a working instrument.</p><br>
+
+          <div class="student-guide-hint">
+            <p>Need help? Visit the <strong>Utility Hub</strong> on the right for service hours and contact details.</p>
+          </div>
+
+          <p>Music majors and Music Department student workers may also request to check out a variety of music
+            technology equipment, including keyboards, microphones, a PA system, and more. Permissions may vary; contact
+            Erik Jarvis for more information regarding these items.</p><br>
+
+          <p>Students enrolled in lessons or ensembles may request to borrow an instrument for the semester or academic
+            year. Most instruments also come with a locker. Students who bring their own instrument may also request a
+            locker. Checkout policies are listed below.</p><br>
+
+          <div class="info">
+            <h3>𝄞 WHO CAN CHECK OUT INSTRUMENTS?</h3>
+            <ul>
+              <li>Students enrolled in music department ensembles and/or lessons</li>
+              <li>Music majors (with permission from professor)</li>
+              <li>Students enrolled in a music department class (with permission from professor)</li>
+              <li>Staff and faculty enrolled in a music department ensemble</li>
+            </ul>
+            <p>If you do not meet these requirements, you must have written permission from both a faculty member of
+              the music department, and the Music Technical Assistant on staff</p>
+          </div>
+
+          <div class="info">
+            <h3>𝄞 HOW SHOULD I CARE FOR MY INSTRUMENT?</h3>
+            <ul>
+              <li>Never leave your instrument unattended</li>
+              <li>Never store your instrument in your car, an empty classroom, campus lounge, etc</li>
+              <li>Do not allow anyone else to play/borrow your instrument</li>
+              <li>Do not eat or drink (except water) near your instrument</li>
+              <li>Always place the instrument back in its case when not in use</li>
+              <li>Be sure your case is latched when picking it up or carrying</li>
+              <li>When storing your instrument, always use the proper orientation (e.g. for string instruments, never
+                store the case strings-down)</li>
+              <li>Please review other instrument care practices with your instructor</li>
+            </ul>
+          </div>
+
+          <div class="info">
+            <h3>𝄞 CHECK-OUT PROCEDURE</h3>
+            <ul>
+              <li>Fill out the Qualtrics form</li>
+              <li>Go to the instrument checkout room in Bucksbaum during open hours</li>
+              <li>Review these policies with a student worker</li>
+              <li>Confirm the check-in date (set a reminder in your calendar)</li>
+              <li>Enjoy a wonderful semester of music-making!</li>
+            </ul>
+          </div>
+
+          <div class="info">
+            <h3>𝄞 CHECK-IN PROCEDURE</h3>
+            <ul>
+              <li>Bring your instrument to the instrument checkout room in Bucksbaum during open hours</li>
+              <li>Review the condition of the instrument with a student worker</li>
+              <li>If the inspection is fine, you’re done! If not, review the consequences and follow-up actions to be
+                taken with a student worker and Music Technical Assistant on staff</li>
+              <li>For all late returns, a fine of <strong>$100/month</strong> will be applied. If returned within one
+                week, the fine will be <strong>waived</strong>. If returned within the month, the fine will be
+                <strong>reduced to $20</strong>.
+              </li>
+            </ul>
+          </div>
+
+          <p><i><strong>NOTE: </strong>Checkout policies are subject to change at the discretion of the Music
+              Department.
+            </i></p>
+
+          {% if session.get('is_staff') %}
+          <div class="staff-welcome-card">
+            <!-- Staff Card Content -->
+          </div>
+          {% else %}
+          {% endif %}
       </section>
 
       <aside class="sidebar">
@@ -60,8 +165,13 @@
           <div class="hub-section">
             <h3>Service Hours</h3>
             <ul class="hours-list">
-              <li><span>Mon - Fri</span> <strong>8:00 AM - 5:00 PM</strong></li>
-              <li><span>Sat - Sun</span> <strong>Closed</strong></li>
+              <li><span>Sunday</span> <strong>3 - 5:00 PM</strong></li>
+              <li><span>Monday</span> <strong>CLOSED</strong></li>
+              <li><span>Tuesday</span> <strong>CLOSED</strong></li>
+              <li><span>Wednesday</span> <strong>2:30 - 4:30 PM</strong></li>
+              <li><span>Thursday</span> <strong>12 - 2:00 PM</strong></li>
+              <li><span>Friday</span> <strong>3 - 5:00 PM</strong></li>
+              <li><span>Saturday</span> <strong>10 - 12:00 PM</strong></li>
             </ul>
           </div>
 
@@ -72,7 +182,13 @@
             <h3>Contact Information</h3>
             <div class="contact-grid">
               <p><span>Email</span><strong>music@grinnell.edu</strong></p>
-              <p><span>Phone</span><strong>(641) 269-2222</strong></p>
+              <p><span>Phone</span><strong>(641) 269-3064</strong></p>
+              <p><span>Fax</span><strong>(641) 269-4420</strong></p>
+              <!-- <p><span>Location</span><i>
+                  Bucksbaum Center for the Arts<br>
+                  1108 Park St<br>
+                  Grinnell, IA 50112<br>
+                  United States</i></p> -->
             </div>
           </div>
 
@@ -83,9 +199,21 @@
             <div class="quick-links-grid">
               <a href="https://www.grinnell.edu/academics/majors-concentrations/music" class="quick-link-item"
                 target="_blank">
-                <span>Department Site</span>
+                <span>Music Department Site</span>
                 <span class="link-arrow">→</span>
               </a>
+
+              <a href="https://colss-prod.ec.grinnell.edu/Student/Courses" class="quick-link-item" target="_blank">
+                <span>Course Catalog</span>
+                <span class="link-arrow">→</span>
+              </a>
+
+              <a href="https://grinco.sharepoint.com/sites/Music/SitePages/Inst.aspx" class="quick-link-item"
+                target="_blank">
+                <span>Sharepoint</span>
+                <span class="link-arrow">→</span>
+              </a>
+
               <!-- <a href="#" class="quick-link-item">
                 <span>Instrument Handbook</span>
                 <span class="link-arrow">→</span>
@@ -112,6 +240,40 @@
   </main>
 
   <div id="loginModal" class="modal">
+    <div class="modal-content login-box">
+      <span id="closeModal" class="close-btn">&times;</span>
+
+      <div class="login-header">
+        <h2>Staff Portal</h2>
+        <p>Please enter your administrative credentials.</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="e.g. p-curry" required>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+
+        <div id="loginError" class="error-text">Invalid username or password.</div>
+
+        <button type="submit" class="btn-primary login-submit">Sign In</button>
+
+        <div class="login-footer">
+          <button type="button" class="btn-link"
+            onclick="alert('Please contact the Music Department IT head to reset your password.')">
+            Forgot or Change Password?
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- <div id="loginModal" class="modal">
     <div class="modal-content auth-modal">
       <button class="close-btn" id="closeModal">&times;</button>
       <h2>Staff Portal</h2>
@@ -128,7 +290,7 @@
         <button type="submit" class="btn-primary">Login</button>
       </form>
     </div>
-  </div>
+  </div> -->
 
   <script>
     const loginModal = document.getElementById('loginModal');

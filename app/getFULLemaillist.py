@@ -33,7 +33,7 @@ def getFULLemaillist(conn: Connection):
 
     for id in Borrower_ID_List:
         query = "SELECT Email FROM borrower WHERE ID = ?"
-        cur.execute(query, (str(id)))
+        cur.execute(query, (str(id),))
         # cur.execute("SELECT Email FROM borrower WHERE ID = ?", (str(id)))
         Email_List.append(cur.fetchone()[0])
     

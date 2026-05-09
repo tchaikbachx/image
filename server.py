@@ -22,14 +22,15 @@ db_path = os.path.join(BASE_DIR, 'app', 'database.db')
 # can import manager now that path is correct (do not move, has
 # to be after path init)
 from manager import manager
+from app import login
+from app.getFULLemaillist import getFULLemaillist
 
 app = Flask(__name__)
-
-# this will have to be changed for security later
-app.secret_key = 'grinnell_secret_key'
+app.secret_key = os.urandom(24)
 
 CORS(app)
 
+auth_manager = login.LoginManager(db_path)
 db = manager(db_path)
 
 
@@ -47,31 +48,48 @@ def index():
 def dashboard():
     return render_template('dash.html')
     
+# add docs
+@app.route('/login', methods=['POST'])
+def login_route():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
 
+    user = auth_manager.login(username, password)
+
+    if user:
+        # 'user' is the username returned from the database
+        session['is_staff'] = True
+        session['user_id'] = user
+        return jsonify({"status": "success"}), 200
+    else:
+        # clear the session
+        session.clear()
+        return jsonify({"status": "unauthorized"}), 401
+
+
+# add docs
 @app.route('/logout')
 def logout():
-    session.clear() # This wipes is_staff and user_id
+    session.clear() # clear the session
     return redirect(url_for('index'))
+
+
+# add docs
+@app.route('/api/checkouts/active_emails')
+def get_active_emails():
+    if not session.get('is_staff'):
+        return jsonify({"error": "Unauthorized"}), 403
+    
+    with db.get_conn() as conn:
+        email_string = getFULLemaillist(conn)
+        # return as a json object
+        return jsonify({"emails": email_string})
 
 
 # +------------------------------------------------------------+
 # |                                        DYNAMIC ROUTING     |
 # +------------------------------------------------------------+
-
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-
-    # using a hardcoded check, will need to change
-    if username == "admin" and password == "1234":
-        session['is_staff'] = True
-        session['user_id'] = "staff_member"
-        return jsonify({"status": "success"}), 200
-    else:
-        return jsonify({"status": "unauthorized"}), 401
-
 
 # route for students to browse items without edit/delete tools
 @app.route('/inventory')
@@ -81,17 +99,12 @@ def student_inventory():
     return render_template('dash.html')
 
 
-# protected route for staff management
-@app.route('/dashboard')
-def staff_dashboard():
-    if not session.get('is_staff'):
-        return redirect(url_for('login'))
-    return render_template('dash.html')
-
-
 # [add defn]
 @app.route('/api/<table_name>/<int:entry_id>', methods=['PUT'])
 def put_entry(table_name, entry_id):
+    if not session.get('is_staff'):
+        return jsonify({"error": "Unauthorized"}), 403
+        
     try:
         data = request.get_json()
         # don't send metadata to update
@@ -114,13 +127,16 @@ def put_entry(table_name, entry_id):
 # [add defn]
 @app.route('/api/checkout', methods=['POST'])
 def checkout_item():
+    if not session.get('is_staff'):
+        return jsonify({"error": "Unauthorized"}), 403
+
     data = request.json
     item_id = data.get('item_id')
     email = data.get('email')
     due_date = data.get('due_date')
     item_type = data.get('item_type') # 'instrument', 'locker', or 'kkey'
 
-    # this is deprecated but i am still transferring some testing so i kept it
+    # this is kinda deprecated but i am still transferring some testing so i kept it
     item_name = db.get_name_by_type(item_type, item_id)
 
     for key in ['Status', 'Availability', 'Loan_Count', 'ID', 'Key_Name', 'Locker_Name']:
@@ -148,6 +164,9 @@ def checkout_item():
 # [add defn]
 @app.route('/api/<table_name>', methods=['POST'])
 def add_entry(table_name):
+    if not session.get('is_staff'):
+        return jsonify({"error": "Unauthorized"}), 403
+
     try:
         payload = request.get_json()
         new_id = db.add(table_name, payload) 
@@ -176,6 +195,9 @@ def get_entry(table_name):
 
 @app.route('/api/checkouts/<int:item_id>', methods=['GET'])
 def get_item_checkouts(item_id):
+    if not session.get('is_staff'):
+        return jsonify({"error": "Unauthorized"}), 403
+
     query = """
         SELECT c.ID, b.Email, c.Due_Date, c.Checkout_Date 
         FROM checkout c
@@ -211,6 +233,9 @@ def get_item_history(name_id):
 # handles checking an item back in
 @app.route('/api/return/<int:loan_id>', methods=['POST'])
 def return_item(loan_id):
+    if not session.get('is_staff'):
+        return jsonify({"error": "Unauthorized"}), 403
+
     success = db.generalized_return(loan_id)
     return jsonify({"status": "success" if success else "failed"}), 200
 
@@ -218,6 +243,9 @@ def return_item(loan_id):
 # [add defn]
 @app.route('/api/<table_name>/<int:entry_id>', methods=['DELETE'])
 def delete_entry(table_name, entry_id):
+    if not session.get('is_staff'):
+        return jsonify({"error": "Unauthorized"}), 403
+        
     try:
         success = db.delete(table_name, entry_id) 
         return jsonify({"status": "deleted" if success else "not found"}), 200
