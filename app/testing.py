@@ -112,5 +112,12 @@ try:
 except Exception as e:
     print("PASS test: failed to add entry with bad data (" + str(e) + ")")
 
+# try to add a dummy instrument to non instrument table
+try:
+    man.add('kkey', jsonify(dummy))
+    print("FAIL test: added dummy instrument to non-instrument table (kkey)")
+except Exception as e:
+    print("PASS test: failed to add dummy instrument to non-instrument table (kkey) (" + str(e) + ")")
+
 # delete test tables after testing finishes
 delTables()
